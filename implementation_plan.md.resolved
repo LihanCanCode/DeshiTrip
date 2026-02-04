@@ -1,0 +1,118 @@
+# Implementation Plan - DeshiTrip
+
+DeshiTrip is a modern web application designed specifically for tourism within Bangladesh. It aims to solve the problem of fragmented tour planning, group expense management, and localized spot recommendations.
+
+## Project Architecture
+
+We will use a modular structure with a clear separation between the backend and frontend.
+
+```mermaid
+graph TD
+    subgraph Monorepo
+        FE[Next.js 14 Frontend]
+        BE[Express Backend]
+    end
+    FE -->|React Query| BE
+    BE -->|Mongoose| MongoDB[(MongoDB Atlas)]
+    BE -->|BullMQ| Redis[(Upstash Redis)]
+    BE -->|Winston| Logs[Logging]
+    Server -->|Maps| Mapbox[Mapbox/react-map-gl]
+```
+
+## Tech Stack Evaluation
+This is a **Production-Ready** stack. To answer your question: **Do we need all of these?**
+- **Essential**: Next.js 14 (App Router), TypeScript, Tailwind, Mongoose, Zod, JWT, react-map-gl.
+- **Highly Recommended**: React Query (greatly simplifies state/data fetching), `next-intl` (best for App Router i18n), `pnpm monorepo` (keeps FE/BE types in sync).
+- **Good to Have (Scalability)**: Zustand (for simple client-side state like language/sidebar), `argon2` (more secure than bcrypt), Swagger (docs).
+- **Optional for MVP**: `BullMQ` (only if we have background tasks like email or heavy processing), `Husky` (adds dev friction but ensures safety), `dotenv-flow`, **Docker** (not strictly needed if using cloud databases like Atlas/Upstash).
+
+## Proposed Phases
+
+### Phase 1: Foundation & Monorepo Configuration
+- [ ] Initialize **pnpm monorepo** (`/apps/web`, `/apps/api`, `/packages/config`).
+- [ ] Setup TypeScript, ESLint, Prettier, and Husky.
+- [ ] Backend structure: Node.js 20 + Express + Swagger.
+
+### Phase 2: Core Auth & i18n
+- [ ] **Backend**: Auth system (Argon2, JWT, Zod validation).
+- [ ] **Frontend**: Next.js 14 shell with `next-intl` (EN/BN setup).
+- [ ] **Shared**: Common Zod schemas for User/Auth.
+- [ ] **UI**: Sign in/up pages with "Deshi" aesthetic.
+
+### Phase 3: Groups & Tourism Data
+- [ ] **Backend**: Group & Tour models, invitations (invite codes).
+- [ ] **API**: Tourist spots CRUD and seed data (Sylhet focus).
+- [ ] **Frontend**: Dashboard, Group creation, and Spot listing.
+
+### Phase 4: Maps & Recommendations
+- [ ] **Integration**: `react-map-gl` with Mapbox.
+- [ ] **Logic**: Recommendation engine based on district, season, and budget.
+- [ ] **Interactivity**: Selecting spots on map to build a day-wise itinerary.
+
+### Phase 5: Expense Management
+- [ ] **Backend**: Expense models & split logic.
+- [ ] **Frontend**: Interactive expense adder with member selection.
+- [ ] **UI**: Visual settlement summary (who owes whom).
+
+### Phase 6: Infrastructure & Deployment
+- [ ] **Docker**: (Optional) Dockerize applications for cloud VPS deployment.
+- [ ] **Infra**: GitHub Actions for CI/CD.
+- [ ] **Ops**: MongoDB Atlas & Upstash Redis integration.
+- [ ] **Polish**: Sentry integration (Phase 2 part b), Winston logging, final UI/UX.
+
+## Proposed Changes
+
+### Backend
+- **Node.js 20** + **Express** + **TypeScript**.
+- **Auth**: JWT with **argon2** for secure hashing.
+- **Validation**: **Zod** models shared between FE and BE.
+- **Documentation**: **Swagger** UI at `/api-docs`.
+
+### Database Schema (Mongoose)
+(Already updated in previous step - see [implementation_plan.md](file:///C:/Users/Lihan/.gemini/antigravity/brain/ad5a08b5-47a9-4eb2-a1d3-cb7f7a1bc44a/implementation_plan.md))
+
+#### API Routes
+- **Auth**: `POST /api/auth/register`, `POST /api/auth/login`
+- **Groups**: `GET /api/groups`, `POST /api/groups`, `POST /api/groups/join`
+- **Spots**: `GET /api/spots`, `GET /api/spots/:id`, `GET /api/spots/recommend`
+- **Tours**: `POST /api/tours`, `GET /api/tours/:id/itinerary`
+- **Expenses**: `POST /api/expenses`, `GET /api/expenses/summary`
+
+---
+
+### Frontend (Next.js + Tailwind CSS)
+The frontend will leverage Next.js App Router for server-side rendering and client-side interactivity.
+
+#### Localization (i18n)
+- We will use `next-i18n-router` and `i18next` for managing translations.
+- Language switcher component in the navbar.
+- Multi-language fields in MongoDB for Tourist Spots (Name, Description).
+
+#### Design System
+- **Colors**: Rich emerald greens (representing Bangladesh's nature), deep obsidian for dark mode, sunset orange for accents.
+- **Components**: Framer Motion for smooth transitions, Glassmorphism for cards.
+
+#### Key Pages
+- `app/page.js`: Landing page with featured spots.
+- `app/auth/login/page.js`: Premium auth interfaces.
+- `app/dashboard/page.js`: User's active tours and groups.
+- `app/groups/[id]/page.js`: Group chat, expense tracking, and map view.
+- `app/recommend/page.js`: Interactive tourism engine.
+
+---
+
+### Travel Recommendation Engine Logic
+1.  **Filter**: Match `destination_district` and `tags` based on `travel_season`.
+2.  **Distance Matrix**: Calculate optimal path starting from `user_location` or district entry point.
+3.  **Budget Fit**: Rank spots by average visit cost and entry fees.
+
+## Verification Plan
+
+### Automated Tests
+- Backend: Jest for API endpoint testing.
+- Frontend: Playwright for end-to-end user flows (Group creation -> Spot selection -> Expense tracking).
+
+### Manual Verification
+- Verify map marker placement for Ratargul and other Sylhet spots.
+- Test expense splitting logic with multiple members.
+- Check responsive layout on simulated mobile devices.

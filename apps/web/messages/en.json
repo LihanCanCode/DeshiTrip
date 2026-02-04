@@ -1,0 +1,15 @@
+{
+    "Index": {
+        "title": "DeshiTrip",
+        "description": "Discover the hidden gems of Bangladesh",
+        "getStarted": "Get Started",
+        "exploreSpots": "Explore Spots"
+    },
+    "Auth": {
+        "login": "Login",
+        "signUp": "Sign Up",
+        "email": "Email",
+        "password": "Password",
+        "name": "Full Name"
+    }
+}

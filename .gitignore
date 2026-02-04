@@ -1,0 +1,16 @@
+# package managers
+node_modules/
+pnpm-store/
+
+# build artifacts
+dist/
+apps/api/dist/
+apps/web/.next/
+
+# environment files
+.env
+.env.*
+
+# logs and local data
+*.log
+data/
