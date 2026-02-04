@@ -62,3 +62,29 @@ export const joinGroup = async (req: Request, res: Response) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+export const updateGroupMemory = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { coverImage, memoryNote, milestones, foodieStat } = req.body;
+        const userId = (req as any).user.id;
+
+        const group = await Group.findById(id);
+        if (!group) return res.status(404).json({ message: 'Group not found' });
+
+        // Only members can update memory
+        if (!group.members.includes(userId)) {
+            return res.status(403).json({ message: 'Only members can update memory' });
+        }
+
+        if (coverImage) group.coverImage = coverImage;
+        if (memoryNote !== undefined) group.memoryNote = memoryNote;
+        if (milestones !== undefined) group.milestones = milestones;
+        if (foodieStat !== undefined) group.foodieStat = foodieStat;
+        await group.save();
+
+        res.json(group);
+    } catch (error: any) {
+        res.status(500).json({ message: error.message });
+    }
+};

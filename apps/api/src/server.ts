@@ -9,6 +9,7 @@ import groupRoutes from './routes/groupRoutes';
 import spotRoutes from './routes/spotRoutes';
 import expenseRoutes from './routes/expenseRoutes';
 import blogRoutes from './routes/blogRoutes';
+import uploadRoutes from './routes/uploadRoutes';
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ app.use('/api/groups', groupRoutes);
 app.use('/api/spots', spotRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/blogs', blogRoutes);
+app.use('/api/upload', uploadRoutes);
 
 app.get('/health', (req: Request, res: Response) => {
     res.status(200).json({ status: 'OK', message: 'DeshiTrip API is running', db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected' });

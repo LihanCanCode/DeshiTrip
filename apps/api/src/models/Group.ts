@@ -11,6 +11,10 @@ export interface IGroup extends Document {
     }[];
     inviteCode: string;
     avatar?: string;
+    coverImage?: string;
+    memoryNote?: string;
+    milestones?: string;
+    foodieStat?: string;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -29,6 +33,10 @@ const groupSchema = new Schema<IGroup>(
         ],
         inviteCode: { type: String, unique: true, required: true },
         avatar: { type: String },
+        coverImage: { type: String, default: '' },
+        memoryNote: { type: String, default: '' },
+        milestones: { type: String, default: '' },
+        foodieStat: { type: String, default: '' },
     },
     { timestamps: true }
 );

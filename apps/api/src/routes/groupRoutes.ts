@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createGroup, getGroups, joinGroup } from '../controllers/groupController';
+import { createGroup, getGroups, joinGroup, updateGroupMemory } from '../controllers/groupController';
 import { authMiddleware } from '../middleware/authMiddleware';
 
 const router: Router = Router();
@@ -22,5 +22,6 @@ router.get('/', (req, res, next) => {
 });
 
 router.post('/join', joinGroup);
+router.patch('/:id/memory', updateGroupMemory);
 
 export default router;

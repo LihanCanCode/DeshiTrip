@@ -5,7 +5,9 @@ import { Wallet, Plus, ArrowUpRight, ArrowDownLeft, PieChart, Users, TrendingUp,
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
+import { MemoryModal } from '@/components/MemoryModal';
 import { useState, useEffect, Suspense } from 'react';
+import { Camera } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -40,6 +42,10 @@ interface Group {
     name: string;
     members: { _id: string; name: string; avatar?: string; email: string }[];
     guests: { name: string; addedBy: string }[];
+    coverImage?: string;
+    memoryNote?: string;
+    milestones?: string;
+    foodieStat?: string;
 }
 
 function ExpensesContent() {
@@ -99,12 +105,16 @@ function ExpensesContent() {
 
     const fetchGroupData = async (id: string) => {
         try {
-            const [expensesRes, summaryRes] = await Promise.all([
+            const [expensesRes, summaryRes, groupsRes] = await Promise.all([
                 api.get(`/expenses/group/${id}`),
-                api.get(`/expenses/summary/${id}`)
+                api.get(`/expenses/summary/${id}`),
+                api.get('/groups')
             ]);
             setExpenses(expensesRes.data);
             setSummary(summaryRes.data);
+            setGroups(groupsRes.data);
+            const updatedGroup = groupsRes.data.find((g: any) => g._id === id);
+            if (updatedGroup) setSelectedGroup(updatedGroup);
         } catch (err: any) {
             console.error('Failed to fetch group data', err);
         }
@@ -145,6 +155,9 @@ function ExpensesContent() {
             alert(err.response?.data?.message || 'Failed to add expense');
         }
     };
+
+    // Memory Modal State
+    const [isMemoryModalOpen, setIsMemoryModalOpen] = useState(false);
 
     // Settlement Logic
     const [isSettlementModalOpen, setIsSettlementModalOpen] = useState(false);
@@ -292,12 +305,60 @@ function ExpensesContent() {
                             <option key={g._id} value={g._id}>{g.name}</option>
                         ))}
                     </select>
+                    <Button onClick={() => setIsMemoryModalOpen(true)} className="rounded-2xl h-14 px-6 bg-zinc-800 text-zinc-300 hover:text-white" size="lg">
+                        <Camera className="mr-2 w-5 h-5" />
+                        Memory
+                    </Button>
                     <Button onClick={() => setIsModalOpen(true)} className="rounded-2xl h-14 px-8 shadow-xl shadow-emerald-500/20" size="lg">
                         <Plus className="mr-2 w-5 h-5" />
                         Add Cost
                     </Button>
                 </div>
             </div>
+
+            {/* Trip Memory Card */}
+            {selectedGroup?.coverImage && (
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="relative w-full h-[400px] rounded-[3rem] overflow-hidden group shadow-2xl"
+                >
+                    <img
+                        src={selectedGroup.coverImage}
+                        alt="Trip Memory"
+                        className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                    <div className="absolute bottom-10 left-10 right-10">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-[10px] font-black uppercase tracking-[0.2em] text-white">
+                                Trip Memory
+                            </div>
+                            <span className="text-white/60 text-[10px] font-bold uppercase tracking-widest italic">
+                                "{selectedGroup.name}"
+                            </span>
+                        </div>
+                        <h2 className="text-4xl md:text-5xl font-black text-white tracking-tighter max-w-2xl leading-tight mb-8">
+                            {selectedGroup.memoryNote || "Capture the moment."}
+                        </h2>
+
+                        <div className="flex flex-wrap gap-6 items-center border-t border-white/10 pt-8 mt-2">
+                            {selectedGroup.milestones && (
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400">The Milestones</p>
+                                    <p className="text-white font-bold text-sm tracking-tight">{selectedGroup.milestones}</p>
+                                </div>
+                            )}
+                            {selectedGroup.foodieStat && (
+                                <div className="space-y-1 pl-6 border-l border-white/10">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-orange-400">The Foodie Stat</p>
+                                    <p className="text-white font-bold text-sm tracking-tight">{selectedGroup.foodieStat}</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </motion.div>
+            )}
 
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -497,6 +558,15 @@ function ExpensesContent() {
                     </div>
                 </form>
             </Modal>
+
+            {/* Memory Modal */}
+            <MemoryModal
+                isOpen={isMemoryModalOpen}
+                onClose={() => setIsMemoryModalOpen(false)}
+                groupId={selectedGroup?._id || ''}
+                onSuccess={() => fetchGroupData(selectedGroup?._id || '')}
+            />
+
             {/* Settlement Modal */}
             <Modal
                 isOpen={isSettlementModalOpen}
@@ -567,6 +637,7 @@ function ExpensesContent() {
                     </div>
                 </form>
             </Modal>
+
         </div>
     );
 }
