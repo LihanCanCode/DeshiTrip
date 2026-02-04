@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from 'framer-motion';
-import { LayoutDashboard, Users, Map, Wallet, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, Map, Wallet, Settings, LogOut, Globe } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, usePathname } from 'next/navigation';
 import { cn } from '@/utils/cn';
@@ -16,6 +16,7 @@ export const DashboardSidebar = () => {
         { icon: LayoutDashboard, label: 'Overview', href: `/${locale}/dashboard` },
         { icon: Users, label: 'My Groups', href: `/${locale}/dashboard/groups` },
         { icon: Map, label: 'Explore Spots', href: `/${locale}/recommend` },
+        { icon: Globe, label: 'Community', href: `/${locale}/community` },
         { icon: Wallet, label: 'Expenses', href: `/${locale}/dashboard/expenses` },
         { icon: Settings, label: 'Settings', href: `/${locale}/dashboard/profile` },
     ];
