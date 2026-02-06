@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { BlogCard } from "@/components/blog/BlogCard";
 import { CreatePostModal } from "@/components/blog/CreatePostModal";
-import { useTranslations } from "next-intl";
 
 export default function CommunityPage() {
     const [blogs, setBlogs] = useState<any[]>([]);
@@ -115,7 +114,7 @@ export default function CommunityPage() {
                     ) : (
                         <div className="text-center py-20 text-zinc-500">
                             <Filter className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                            <p className="text-lg">No stories found regarding "{filterSpot}".</p>
+                            <p className="text-lg">No stories found regarding &quot;{filterSpot}&quot;.</p>
                             <p className="text-sm">Be the first to write about it!</p>
                         </div>
                     )}

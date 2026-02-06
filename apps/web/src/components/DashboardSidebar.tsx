@@ -3,12 +3,13 @@
 import { motion } from 'framer-motion';
 import { LayoutDashboard, Users, Map, Wallet, Settings, LogOut, Globe } from 'lucide-react';
 import Link from 'next/link';
-import { useParams, usePathname } from 'next/navigation';
+import { useParams, usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/utils/cn';
 import { Logo } from './Logo';
 
 export const DashboardSidebar = () => {
     const pathname = usePathname();
+    const router = useRouter();
     const params = useParams();
     const locale = params.locale as string;
 
@@ -20,6 +21,12 @@ export const DashboardSidebar = () => {
         { icon: Wallet, label: 'Expenses', href: `/${locale}/dashboard/expenses` },
         { icon: Settings, label: 'Settings', href: `/${locale}/dashboard/profile` },
     ];
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        router.push(`/${locale}/auth/login`);
+    };
 
     return (
         <aside className="w-80 h-full bg-[#0a0f0d] border-r border-white/5 p-8 flex flex-col relative z-20">
@@ -52,7 +59,10 @@ export const DashboardSidebar = () => {
                 })}
             </nav>
 
-            <button className="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-zinc-500 hover:text-red-400 hover:bg-red-400/5 transition-all group mt-auto">
+            <button
+                onClick={handleLogout}
+                className="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-zinc-500 hover:text-red-400 hover:bg-red-400/5 transition-all group mt-auto"
+            >
                 <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                 <span className="font-bold text-sm tracking-wide">Logout</span>
             </button>

@@ -1,6 +1,6 @@
-import * as React from "react";
-import { motion, HTMLMotionProps } from "framer-motion";
+import React from 'react';
 import { cn } from "@/utils/cn";
+
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: 'primary' | 'secondary' | 'outline' | 'ghost';

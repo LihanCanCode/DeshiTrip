@@ -10,7 +10,7 @@ export default getRequestConfig(async ({ locale: rawLocale }) => {
     const locale = rawLocale || 'en';
 
     // Validate that the detected locale is supported
-    if (!locales.includes(locale as any)) notFound();
+    if (!(locales as string[]).includes(locale)) notFound();
 
     return {
         locale,
