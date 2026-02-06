@@ -5,42 +5,94 @@ import { TravelMap } from "@/components/TravelMap";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Sparkles, Filter, Search } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { useParams } from "next/navigation";
 
 import { spotsData, Spot } from "@/data/spotsData";
 import { SpotDetailModal } from "@/components/SpotDetailModal";
 
-// Use imported spotsData instead of local mockSpots
-const initialSpots = spotsData;
+const curatedSpots = spotsData;
 
 export default function RecommendPage() {
-    const t = useTranslations('Index');
+    const t = useTranslations('Spots');
+    const params = useParams();
+    const locale = (params.locale as string) || 'en';
+    const currentLocale = locale as 'en' | 'bn';
+
     const [selectedSpot, setSelectedSpot] = useState<any>(null);
     const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
-    const [routeData, setRouteData] = useState<any>(null);
+    const [allRoutes, setAllRoutes] = useState<Record<string, any>>({});
+    const [searchResults, setSearchResults] = useState<any[]>([]);
+    const [searchRoutes, setSearchRoutes] = useState<Record<string, any>>({});
     const [routeMetrics, setRouteMetrics] = useState<{ distance: string; duration: string } | null>(null);
     const [loadingRoute, setLoadingRoute] = useState(false);
-
-    // Search State
     const [searchQuery, setSearchQuery] = useState("");
-    const [searchResults, setSearchResults] = useState<any[]>([]);
     const [isSearching, setIsSearching] = useState(false);
-
-    // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // Track fetched IDs to avoid redundant requests
+    const fetchedIds = useRef<Set<string>>(new Set());
 
     // Get User Location
     useEffect(() => {
         if ("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition((position) => {
                 setUserLocation([position.coords.longitude, position.coords.latitude]);
-            });
+            }, (err) => console.error("Location access denied:", err));
         }
     }, []);
 
-    // Search Function (Nominatim)
+    // Improved Initial Load: Fetch routes for all curated spots deterministically
+    useEffect(() => {
+        if (userLocation) {
+            const fetchAllRoutes = async () => {
+                const apiKey = process.env.NEXT_PUBLIC_ORS_API_KEY;
+                if (!apiKey || apiKey === 'your_open_route_service_api_key_here') return;
+
+                const start = userLocation.join(',');
+
+                // Identify spots that haven't been fetched yet
+                const missingSpots = curatedSpots.filter(spot => !fetchedIds.current.has(spot._id));
+
+                if (missingSpots.length === 0) return;
+
+                console.log(`Fetching routes for ${missingSpots.length} missing spots...`);
+
+                // Fetch individually to handle per-spot errors gracefully
+                const routePromises = missingSpots.map(async (spot) => {
+                    try {
+                        const end = `${spot.location.coordinates[0]},${spot.location.coordinates[1]}`;
+                        const url = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${apiKey}&start=${start}&end=${end}`;
+                        const res = await fetch(url);
+                        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                        const data = await res.json();
+                        if (data.features && data.features.length > 0) {
+                            fetchedIds.current.add(spot._id);
+                            return { id: spot._id, data: data.features[0] };
+                        }
+                    } catch (err) {
+                        console.error(`Failed to fetch route for ${spot.name.en}:`, err);
+                    }
+                    return null;
+                });
+
+                const results = await Promise.all(routePromises);
+                const validRoutes = results.reduce((acc: any, curr) => {
+                    if (curr) acc[curr.id] = curr.data;
+                    return acc;
+                }, {});
+
+                if (Object.keys(validRoutes).length > 0) {
+                    setAllRoutes(prev => ({ ...prev, ...validRoutes }));
+                }
+            };
+            fetchAllRoutes();
+        }
+    }, [userLocation, curatedSpots.length]); // Re-run if location or spots list changes
+
+    // Debounced Search with stable place_id keys
     useEffect(() => {
         const delaySearch = setTimeout(async () => {
             if (searchQuery.length > 2) {
@@ -49,12 +101,11 @@ export default function RecommendPage() {
                     const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery + " Bangladesh")}&limit=5`);
                     const data = await res.json();
 
-                    const formattedResults = data.map((item: any, index: number) => ({
-                        _id: `search-${index}`,
+                    const formattedResults = data.map((item: any) => ({
+                        _id: `search-${item.place_id}`,
                         name: { en: item.display_name.split(',')[0], bn: item.display_name.split(',')[0] },
                         location: { coordinates: [parseFloat(item.lon), parseFloat(item.lat)] },
                         isSearchResult: true
-                        // Note: Search results won't have 'tourPlan' data yet
                     }));
 
                     setSearchResults(formattedResults);
@@ -66,29 +117,19 @@ export default function RecommendPage() {
             } else {
                 setSearchResults([]);
             }
-        }, 800); // 800ms debounce
+        }, 800);
 
         return () => clearTimeout(delaySearch);
     }, [searchQuery]);
 
-    // Fetch Route when spot selected
+    // Fetch individual route for search results if selected
     useEffect(() => {
-        if (selectedSpot && userLocation) {
+        if (selectedSpot && selectedSpot.isSearchResult && userLocation && !searchRoutes[selectedSpot._id]) {
             setLoadingRoute(true);
-            const fetchRoute = async () => {
+            const fetchIndividual = async () => {
                 try {
-                    // Try to generate route even if no key to show "straight line" at least? 
-                    // No, ORS logic handles the fetch. If no key, sidebar shows "Add Key".
                     const apiKey = process.env.NEXT_PUBLIC_ORS_API_KEY;
-                    if (!apiKey || apiKey === 'your_open_route_service_api_key_here') {
-                        // console.warn("ORS API Key missing"); 
-                        // Only warn once or handle gracefully.
-                        if (!routeMetrics) {
-                            setRouteMetrics({ distance: "Calculating...", duration: "Add API Key" });
-                        }
-                        setLoadingRoute(false);
-                        return;
-                    }
+                    if (!apiKey || apiKey === 'your_open_route_service_api_key_here') return;
 
                     const start = userLocation.join(',');
                     const end = `${selectedSpot.location.coordinates[0]},${selectedSpot.location.coordinates[1]}`;
@@ -96,37 +137,44 @@ export default function RecommendPage() {
 
                     const res = await fetch(url);
                     const data = await res.json();
-
                     if (data.features && data.features.length > 0) {
-                        setRouteData(data.features[0]);
-                        const props = data.features[0].properties;
-
-                        // Distance in km
-                        const distKm = (props.summary.distance / 1000).toFixed(1);
-
-                        // Duration
-                        const durSecs = props.summary.duration;
-                        const hours = Math.floor(durSecs / 3600);
-                        const mins = Math.floor((durSecs % 3600) / 60);
-                        const durationStr = hours > 0 ? `${hours}h ${mins}m` : `${mins} min`;
-
-                        setRouteMetrics({ distance: `${distKm} km`, duration: durationStr });
+                        setSearchRoutes(prev => ({ ...prev, [selectedSpot._id]: data.features[0] }));
                     }
-                } catch (error) {
-                    console.error("Failed to fetch route:", error);
+                } catch (err) {
+                    console.error("Failed to fetch individual route:", err);
                 } finally {
                     setLoadingRoute(false);
                 }
             };
-            fetchRoute();
-        } else {
-            setRouteData(null);
+            fetchIndividual();
+        }
+    }, [selectedSpot, userLocation, searchRoutes]);
+
+    // DERIVED STATE: Always get current route from active selection ID
+    const currentRouteData = useMemo(() => {
+        if (!selectedSpot) return null;
+        const route = allRoutes[selectedSpot._id] || searchRoutes[selectedSpot._id];
+        return route || null;
+    }, [selectedSpot, allRoutes, searchRoutes]);
+
+    // Update metrics when currentRouteData changes
+    useEffect(() => {
+        if (currentRouteData) {
+            const props = currentRouteData.properties;
+            const distKm = (props.summary.distance / 1000).toFixed(1);
+            const durSecs = props.summary.duration;
+            const hours = Math.floor(durSecs / 3600);
+            const mins = Math.floor((durSecs % 3600) / 60);
+            const durationStr = hours > 0 ? `${hours}h ${mins}m` : `${mins} min`;
+            setRouteMetrics({ distance: `${distKm} km`, duration: durationStr });
+            setLoadingRoute(false); // Clear loading if it was a search result
+        } else if (selectedSpot && !loadingRoute && !allRoutes[selectedSpot._id]) {
+            // If we selected something but have no route and not loading, we might want a null state
             setRouteMetrics(null);
         }
-    }, [selectedSpot, userLocation]);
+    }, [currentRouteData, selectedSpot, loadingRoute, allRoutes]);
 
-    // List to display
-    const displaySpots = searchQuery.length > 2 ? searchResults : initialSpots;
+    const displaySpots = searchQuery.length > 2 ? searchResults : curatedSpots;
 
     return (
         <DashboardLayout>
@@ -141,17 +189,17 @@ export default function RecommendPage() {
                     <div>
                         <div className="flex items-center gap-2 text-emerald-500 mb-2">
                             <Sparkles className="w-5 h-5" />
-                            <span className="text-sm font-bold uppercase tracking-widest">AI Recommendations</span>
+                            <span className="text-sm font-bold uppercase tracking-widest">{t('aiRecommendation')}</span>
                         </div>
-                        <h1 className="text-4xl font-black">Find Your Next Spot</h1>
-                        <p className="text-zinc-500 mt-2">Discover curated tour plans & expenses.</p>
+                        <h1 className="text-4xl font-black">{t('title')}</h1>
+                        <p className="text-zinc-500 mt-2">{t('subtitle')}</p>
                     </div>
 
                     <div className="flex gap-4">
                         <div className="relative w-80">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
                             <Input
-                                placeholder="Search places (e.g., Sajek)..."
+                                placeholder={t('searchPlaceholder')}
                                 className="pl-12 h-14"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -162,21 +210,20 @@ export default function RecommendPage() {
                         </div>
                         <Button variant="outline" className="h-14">
                             <Filter className="mr-2 w-5 h-5" />
-                            Filters
+                            {t('filters')}
                         </Button>
                     </div>
                 </div>
 
                 <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-8 min-h-0">
-                    {/* Sidebar Filters / Info */}
                     <div className="lg:col-span-1 space-y-6 overflow-y-auto pr-2 custom-scrollbar">
                         <h3 className="text-lg font-bold flex items-center gap-2">
-                            {searchQuery.length > 2 ? 'Search Results' : <>Top <span className="text-emerald-500">Destinations</span></>}
+                            {searchQuery.length > 2 ? t('searchResults') : t('topDestinations')}
                         </h3>
 
                         <div className="space-y-4">
                             {displaySpots.length === 0 && searchQuery.length > 2 && !isSearching && (
-                                <p className="text-zinc-500 italic">No places found.</p>
+                                <p className="text-zinc-500 italic">{t('noPlacesFound')}</p>
                             )}
 
                             {displaySpots.map((spot, i) => (
@@ -187,17 +234,16 @@ export default function RecommendPage() {
                                     transition={{ delay: i * 0.1 }}
                                     onClick={() => setSelectedSpot(spot)}
                                     className={`glass p-5 rounded-3xl border transition-all cursor-pointer group ${selectedSpot?._id === spot._id
-                                            ? 'bg-emerald-900/20 border-emerald-500/50 ring-1 ring-emerald-500'
-                                            : 'border-white/5 bg-white/[0.02] hover:bg-white/[0.04]'
+                                        ? 'bg-emerald-900/20 border-emerald-500/50 ring-1 ring-emerald-500'
+                                        : 'border-white/5 bg-white/[0.02] hover:bg-white/[0.04]'
                                         }`}
                                 >
                                     <h4 className={`font-bold text-lg transition-colors ${selectedSpot?._id === spot._id ? 'text-emerald-400' : 'group-hover:text-emerald-400'
-                                        }`}>{spot.name.en}</h4>
+                                        }`}>{spot.name[currentLocale] || spot.name.en}</h4>
 
-                                    {/* Dynamic Metrics */}
                                     {selectedSpot?._id === spot._id && routeMetrics ? (
                                         <p className="text-emerald-400 text-sm mt-1 font-bold animate-pulse">
-                                            {routeMetrics.distance} • {routeMetrics.duration} drive
+                                            {routeMetrics.distance} • {routeMetrics.duration} {t('drive')}
                                         </p>
                                     ) : (
                                         <p className="text-zinc-500 text-sm mt-1">
@@ -206,17 +252,16 @@ export default function RecommendPage() {
                                     )}
 
                                     <div className="flex gap-2 mt-4">
-                                        <span className="px-2 py-1 bg-zinc-800 rounded-md text-[10px] uppercase font-bold text-zinc-400 tracking-tighter">Nature</span>
-                                        <span className="px-2 py-1 bg-zinc-800 rounded-md text-[10px] uppercase font-bold text-zinc-400 tracking-tighter">Budget Friendly</span>
+                                        <span className="px-2 py-1 bg-zinc-800 rounded-md text-[10px] uppercase font-bold text-zinc-400 tracking-tighter">{t('nature')}</span>
+                                        <span className="px-2 py-1 bg-zinc-800 rounded-md text-[10px] uppercase font-bold text-zinc-400 tracking-tighter">{t('budgetFriendly')}</span>
                                     </div>
 
                                     {selectedSpot?._id === spot._id && (
                                         <div className="mt-4 flex flex-col gap-2">
                                             <div className="text-xs text-emerald-500 font-bold flex items-center gap-1">
-                                                {loadingRoute ? 'Calculating Route...' : 'Viewing Route'} <span className="animate-pulse">●</span>
+                                                {loadingRoute && !currentRouteData ? t('calculatingRoute') : t('viewingRoute')} <span className="animate-pulse">●</span>
                                             </div>
 
-                                            {/* Tour Plan Button (Only for rich data spots) */}
                                             {'tourPlan' in spot && (
                                                 <Button
                                                     className="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-bold rounded-xl"
@@ -226,7 +271,7 @@ export default function RecommendPage() {
                                                         setIsModalOpen(true);
                                                     }}
                                                 >
-                                                    View Tour Plan & Cost
+                                                    {t('viewTourPlan')}
                                                 </Button>
                                             )}
                                         </div>
@@ -234,24 +279,15 @@ export default function RecommendPage() {
                                 </motion.div>
                             ))}
                         </div>
-
-                        {!searchQuery && (
-                            <div className="p-6 rounded-[2rem] bg-gradient-to-br from-emerald-600/20 to-teal-900/20 border border-emerald-500/10">
-                                <h4 className="font-bold mb-2 text-emerald-400">Pro Tip</h4>
-                                <p className="text-sm text-zinc-400 leading-relaxed">
-                                    Click "View Tour Plan" on any top destination to see detailed transport options and budget estimates!
-                                </p>
-                            </div>
-                        )}
                     </div>
 
-                    {/* Map Area */}
                     <div className="lg:col-span-3 min-h-[500px]">
                         <TravelMap
                             spots={displaySpots as any}
                             selectedSpot={selectedSpot}
                             userLocation={userLocation}
-                            routeData={routeData}
+                            routeData={currentRouteData}
+                            allRoutes={allRoutes}
                         />
                     </div>
                 </div>

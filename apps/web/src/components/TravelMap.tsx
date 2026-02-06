@@ -25,9 +25,10 @@ interface TravelMapProps {
     selectedSpot?: Spot | null;
     userLocation?: [number, number] | null;
     routeData?: any;
+    allRoutes?: Record<string, any>;
 }
 
-export const TravelMap = ({ spots, selectedSpot = null, userLocation = null, routeData = null }: TravelMapProps) => {
+export const TravelMap = ({ spots, selectedSpot = null, userLocation = null, routeData = null, allRoutes = {} }: TravelMapProps) => {
     return (
         <div className="w-full h-full rounded-[2.5rem] overflow-hidden border border-white/5 relative bg-zinc-900">
             <LeafletMap
@@ -35,6 +36,7 @@ export const TravelMap = ({ spots, selectedSpot = null, userLocation = null, rou
                 selectedSpot={selectedSpot}
                 userLocation={userLocation}
                 routeData={routeData}
+                allRoutes={allRoutes}
             />
         </div>
     );

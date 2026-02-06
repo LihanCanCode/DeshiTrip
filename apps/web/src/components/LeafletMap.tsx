@@ -35,6 +35,7 @@ interface LeafletMapProps {
     selectedSpot: Spot | null;
     userLocation: [number, number] | null;
     routeData: any;
+    allRoutes: Record<string, any>;
 }
 
 // Component to handle FlyTo animation
@@ -43,8 +44,8 @@ const FlyToSpot = ({ spot }: { spot: Spot | null }) => {
 
     useEffect(() => {
         if (spot) {
-            map.flyTo([spot.location.coordinates[1], spot.location.coordinates[0]], 12, {
-                duration: 2 // smooth animation duration in seconds
+            map.flyTo([spot.location.coordinates[1], spot.location.coordinates[0]], 10, {
+                duration: 2
             });
         }
     }, [spot, map]);
@@ -52,13 +53,13 @@ const FlyToSpot = ({ spot }: { spot: Spot | null }) => {
     return null;
 };
 
-export default function LeafletMap({ spots, selectedSpot, userLocation, routeData }: LeafletMapProps) {
-    const center: [number, number] = [24.8949, 91.8687]; // Default to Sylhet
-    const zoom = 8;
+export default function LeafletMap({ spots, selectedSpot, userLocation, routeData, allRoutes }: LeafletMapProps) {
+    const defaultCenter: [number, number] = [23.8103, 90.4125]; // Center of Bangladesh (Dhaka)
+    const zoom = 7;
 
     return (
         <MapContainer
-            center={center}
+            center={defaultCenter}
             zoom={zoom}
             style={{ height: '100%', width: '100%', borderRadius: '2.5rem' }}
             className="z-0"
@@ -68,13 +69,12 @@ export default function LeafletMap({ spots, selectedSpot, userLocation, routeDat
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
 
-            {/* Logic Components */}
             <FlyToSpot spot={selectedSpot} />
 
-            {/* Tourist Spots */}
+            {/* Tourist Markers */}
             {spots.map((spot) => (
                 <Marker
-                    key={spot._id}
+                    key={`marker-${spot._id}`}
                     position={[spot.location.coordinates[1], spot.location.coordinates[0]]}
                     icon={defaultIcon}
                 >
@@ -84,18 +84,44 @@ export default function LeafletMap({ spots, selectedSpot, userLocation, routeDat
                 </Marker>
             ))}
 
-            {/* User Location Marker */}
+            {/* User Marker */}
             {userLocation && (
                 <Marker position={[userLocation[1], userLocation[0]]} icon={userIcon}>
                     <Popup className="font-sans font-bold text-sm">You are here</Popup>
                 </Marker>
             )}
 
-            {/* Render Actual Road Route */}
+            {/* Background Routes (Curated only) - Rendered with stability */}
+            {Object.entries(allRoutes).map(([spotId, data]) => {
+                // EXCLUDE the currently selected spot from background rendering to avoid overlap confusion
+                if (selectedSpot && spotId === selectedSpot._id) return null;
+
+                return (
+                    <GeoJSON
+                        key={`bg-route-${spotId}`}
+                        data={data as any}
+                        style={{ color: '#10b981', weight: 4, opacity: 0.25 }}
+                    />
+                );
+            })}
+
+            {/* ACTIVE SELECT ROUTE - Rendered ON TOP with high contrast */}
             {routeData && (
                 <GeoJSON
-                    data={routeData}
-                    style={{ color: '#10b981', weight: 5, opacity: 0.8 }}
+                    key={`active-route-${selectedSpot?._id}-${JSON.stringify(routeData.properties?.summary)}`}
+                    data={routeData as any}
+                    style={{ color: '#ffffff', weight: 7, opacity: 1, dashArray: '1, 12', lineCap: 'round' }}
+                >
+                    {/* Outer glow effect via a second GeoJSON layer below if we wanted, but dashArray is cleaner for "active" look */}
+                </GeoJSON>
+            )}
+
+            {/* Solid line below the dashed line for better visibility */}
+            {routeData && (
+                <GeoJSON
+                    key={`active-route-solid-${selectedSpot?._id}`}
+                    data={routeData as any}
+                    style={{ color: '#10b981', weight: 8, opacity: 0.8 }}
                 />
             )}
         </MapContainer>

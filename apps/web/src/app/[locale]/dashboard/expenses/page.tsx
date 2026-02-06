@@ -12,6 +12,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useSearchParams, useRouter, useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import api from '@/utils/api';
 
 const expenseSchema = z.object({
@@ -60,6 +61,7 @@ function ExpensesContent() {
     const [groups, setGroups] = useState<Group[]>([]);
     const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
     const [loading, setLoading] = useState(true);
+    const t = useTranslations('Expenses');
     const [error, setError] = useState<string | null>(null);
     const [summary, setSummary] = useState<any>(null);
 
@@ -265,7 +267,7 @@ function ExpensesContent() {
         return (
             <div className="h-[60vh] flex flex-col items-center justify-center gap-4 text-zinc-500">
                 <Loader2 className="w-10 h-10 animate-spin text-emerald-500" />
-                <p className="font-bold animate-pulse">Loading adventure data...</p>
+                <p className="font-bold animate-pulse">{t('loadingData')}</p>
             </div>
         );
     }
@@ -274,10 +276,10 @@ function ExpensesContent() {
         return (
             <div className="glass p-20 rounded-[3rem] border-red-500/10 bg-red-500/5 flex flex-col items-center justify-center text-center">
                 <AlertCircle className="w-16 h-16 mb-6 text-red-500" />
-                <h3 className="text-2xl font-bold text-red-500">Connection Error</h3>
-                <p className="max-w-md mt-4 text-zinc-500 mb-8">{error}. Please make sure the API server is running on port 8000.</p>
+                <h3 className="text-2xl font-bold text-red-500">{t('connectionError')}</h3>
+                <p className="max-w-md mt-4 text-zinc-500 mb-8">{t('connectionDesc', { error })}</p>
                 <Button onClick={() => window.location.reload()} className="rounded-2xl h-14">
-                    Retry Connection
+                    {t('retry')}
                 </Button>
             </div>
         );
@@ -287,10 +289,10 @@ function ExpensesContent() {
         return (
             <div className="glass p-20 rounded-[3rem] border-white/5 bg-white/[0.02] flex flex-col items-center justify-center text-center">
                 <Users className="w-16 h-16 mb-6 text-zinc-600" />
-                <h3 className="text-2xl font-bold text-zinc-400">No Groups Found</h3>
-                <p className="max-w-md mt-4 text-zinc-500 mb-8">You need to be in a group to track expenses. Create or join a group first!</p>
+                <h3 className="text-2xl font-bold text-zinc-400">{t('noGroups')}</h3>
+                <p className="max-w-md mt-4 text-zinc-500 mb-8">{t('noGroupsDesc')}</p>
                 <Button onClick={() => router.push(`/${locale}/dashboard/groups`)} className="rounded-2xl h-14">
-                    Go to My Groups
+                    {t('goGroups')}
                 </Button>
             </div>
         );
@@ -301,12 +303,12 @@ function ExpensesContent() {
             <div className="flex justify-between items-center">
                 <div>
                     <div className="flex items-center gap-3 mb-2">
-                        <h1 className="text-4xl font-black tracking-tighter">EXPENSES</h1>
+                        <h1 className="text-4xl font-black tracking-tighter uppercase">{t('title')}</h1>
                         <span className="px-3 py-1 bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest rounded-full border border-emerald-500/20">
-                            {selectedGroup?.name || 'Loading...'}
+                            {selectedGroup?.name || t('loadingData')}
                         </span>
                     </div>
-                    <p className="text-zinc-500 font-medium">Tracking precisely every Taka spent on your adventure.</p>
+                    <p className="text-zinc-500 font-medium">{t('subtitle')}</p>
                 </div>
                 <div className="flex gap-4">
                     <select
@@ -320,11 +322,11 @@ function ExpensesContent() {
                     </select>
                     <Button onClick={() => setIsMemoryModalOpen(true)} className="rounded-2xl h-14 px-6 bg-zinc-800 text-zinc-300 hover:text-white" size="lg">
                         <Camera className="mr-2 w-5 h-5" />
-                        Memory
+                        {t('memory')}
                     </Button>
                     <Button onClick={() => setIsModalOpen(true)} className="rounded-2xl h-14 px-8 shadow-xl shadow-emerald-500/20" size="lg">
                         <Plus className="mr-2 w-5 h-5" />
-                        Add Cost
+                        {t('addCost')}
                     </Button>
                 </div>
             </div>
@@ -345,26 +347,26 @@ function ExpensesContent() {
                     <div className="absolute bottom-10 left-10 right-10">
                         <div className="flex items-center gap-3 mb-4">
                             <div className="px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-[10px] font-black uppercase tracking-[0.2em] text-white">
-                                Trip Memory
+                                {t('tripMemory')}
                             </div>
                             <span className="text-white/60 text-[10px] font-bold uppercase tracking-widest italic">
                                 "{selectedGroup.name}"
                             </span>
                         </div>
                         <h2 className="text-4xl md:text-5xl font-black text-white tracking-tighter max-w-2xl leading-tight mb-8">
-                            {selectedGroup.memoryNote || "Capture the moment."}
+                            {selectedGroup.memoryNote || t('captureMoment')}
                         </h2>
 
                         <div className="flex flex-wrap gap-6 items-center border-t border-white/10 pt-8 mt-2">
                             {selectedGroup.milestones && (
                                 <div className="space-y-1">
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400">The Milestones</p>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400">{t('milestones')}</p>
                                     <p className="text-white font-bold text-sm tracking-tight">{selectedGroup.milestones}</p>
                                 </div>
                             )}
                             {selectedGroup.foodieStat && (
                                 <div className="space-y-1 pl-6 border-l border-white/10">
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-orange-400">The Foodie Stat</p>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-orange-400">{t('foodieStat')}</p>
                                     <p className="text-white font-bold text-sm tracking-tight">{selectedGroup.foodieStat}</p>
                                 </div>
                             )}
@@ -377,11 +379,11 @@ function ExpensesContent() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div className="glass p-8 rounded-[2.5rem] border-white/10 bg-gradient-to-br from-white/[0.05] to-transparent col-span-1 md:col-span-2 relative overflow-hidden group">
                     <div className="relative z-10">
-                        <p className="text-zinc-500 text-xs font-black uppercase tracking-widest mb-2 opacity-60">Total Budget Spent</p>
+                        <p className="text-zinc-500 text-xs font-black uppercase tracking-widest mb-2 opacity-60">{t('summary.totalBudget')}</p>
                         <h3 className="text-6xl font-black tracking-tighter">৳ {totalSpend.toLocaleString()}</h3>
                         <div className="mt-8 flex items-center gap-2 text-emerald-400 bg-emerald-500/10 w-fit px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-emerald-500/20">
                             <TrendingUp className="w-3.5 h-3.5" />
-                            Live Calculation
+                            {t('summary.liveCalc')}
                         </div>
                     </div>
                     <PieChart className="absolute -right-8 -bottom-8 w-48 h-48 text-white/[0.02] -rotate-12 group-hover:rotate-0 transition-transform duration-700" />
@@ -392,8 +394,8 @@ function ExpensesContent() {
                         <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-500 w-fit mb-4 border border-blue-500/20">
                             <ArrowUpRight className="w-5 h-5" />
                         </div>
-                        <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest pb-1">Group Strength</p>
-                        <h3 className="text-2xl font-black">{(selectedGroup?.members.length || 0) + (selectedGroup?.guests?.length || 0)} Members</h3>
+                        <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest pb-1">{t('summary.groupStrength')}</p>
+                        <h3 className="text-2xl font-black">{(selectedGroup?.members.length || 0) + (selectedGroup?.guests?.length || 0)} {t('summary.members')}</h3>
                     </div>
                 </div>
 
@@ -402,8 +404,8 @@ function ExpensesContent() {
                         <div className="p-3 rounded-2xl bg-orange-500/10 text-orange-500 w-fit mb-4 border border-orange-500/20">
                             <ArrowDownLeft className="w-5 h-5" />
                         </div>
-                        <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest pb-1">Recent Activity</p>
-                        <h3 className="text-2xl font-black">{expenses.length} Entries</h3>
+                        <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest pb-1">{t('summary.recentActivity')}</p>
+                        <h3 className="text-2xl font-black">{expenses.length} {t('summary.entries')}</h3>
                     </div>
                 </div>
             </div>
@@ -412,15 +414,15 @@ function ExpensesContent() {
                 {/* Recent Expenses */}
                 <div className="lg:col-span-2 space-y-6">
                     <div className="flex items-center justify-between px-2">
-                        <h2 className="text-2xl font-black tracking-tighter text-white uppercase">Ledger History</h2>
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600">Secure Records</span>
+                        <h2 className="text-2xl font-black tracking-tighter text-white uppercase">{t('ledger')}</h2>
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600">{t('secureRecords')}</span>
                     </div>
 
                     {expenses.length === 0 ? (
                         <div className="glass p-20 rounded-[3rem] border-white/5 bg-white/[0.01] flex flex-col items-center justify-center text-center opacity-40 grayscale">
                             <Wallet className="w-16 h-16 mb-4 text-zinc-600" />
-                            <h4 className="text-lg font-bold text-zinc-400 uppercase tracking-widest">Clean Slate</h4>
-                            <p className="text-xs max-w-[200px] mt-2 font-medium">Log the first expense to begin the group ledger.</p>
+                            <h4 className="text-lg font-bold text-zinc-400 uppercase tracking-widest">{t('cleanSlate')}</h4>
+                            <p className="text-xs max-w-[200px] mt-2 font-medium">{t('logFirst')}</p>
                         </div>
                     ) : (
                         <div className="space-y-4">
@@ -458,7 +460,7 @@ function ExpensesContent() {
                 {/* Settlement Summary (Simplified display for now) */}
                 <div className="space-y-6">
                     <div className="flex items-center justify-between px-2">
-                        <h2 className="text-2xl font-black tracking-tighter text-white uppercase">Settlements</h2>
+                        <h2 className="text-2xl font-black tracking-tighter text-white uppercase">{t('settlements')}</h2>
                     </div>
                     <div className="glass p-8 rounded-[2.5rem] border-white/5 bg-white/[0.02] space-y-4">
                         {summary && summary.length > 0 ? (
@@ -472,7 +474,7 @@ function ExpensesContent() {
                                             <div>
                                                 <p className="font-bold text-white text-sm">{item.name}</p>
                                                 <p className={`text-[10px] font-black uppercase tracking-widest ${item.amount > 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-                                                    {item.amount > 0 ? 'Gets Back' : 'Owes'}
+                                                    {item.amount > 0 ? t('getsBack') : t('owes')}
                                                 </p>
                                             </div>
                                         </div>
@@ -485,8 +487,8 @@ function ExpensesContent() {
                         ) : (
                             <div className="text-center py-6">
                                 <Users className="w-10 h-10 mx-auto mb-4 text-emerald-500/20" />
-                                <p className="text-sm font-black uppercase tracking-widest text-zinc-500">All settled up!</p>
-                                <p className="text-[10px] text-zinc-600 mt-2">No pending balances.</p>
+                                <p className="text-sm font-black uppercase tracking-widest text-zinc-500">{t('allSettled')}</p>
+                                <p className="text-[10px] text-zinc-600 mt-2">{t('noPending')}</p>
                             </div>
                         )}
 
@@ -494,7 +496,7 @@ function ExpensesContent() {
                             onClick={() => setIsSettlementModalOpen(true)}
                             className="w-full h-16 rounded-[1.5rem] bg-zinc-900 hover:bg-zinc-800 shadow-none border border-white/5 text-xs font-black uppercase tracking-widest transition-all mt-4"
                         >
-                            Record Settlement
+                            {t('recordSettlement')}
                         </Button>
                     </div>
                 </div>
@@ -504,11 +506,11 @@ function ExpensesContent() {
             <Modal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                title="Add Group Expense"
+                title={t('addExpense')}
             >
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">What did you pay for?</label>
+                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">{t('descriptionLabel')}</label>
                         <Input
                             placeholder="e.g. Dinner at Pauchon"
                             className={errors.description ? 'border-red-500/50 bg-red-500/5 h-16 rounded-2xl' : 'h-16 rounded-2xl'}
@@ -523,7 +525,7 @@ function ExpensesContent() {
 
                     <div className="grid grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Amount (৳)</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">{t('amountLabel')}</label>
                             <Input
                                 type="number"
                                 placeholder="0.00"
@@ -537,7 +539,7 @@ function ExpensesContent() {
                             )}
                         </div>
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Category</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">{t('categoryLabel')}</label>
                             <select
                                 {...register('category')}
                                 className="w-full h-16 bg-white/[0.03] border border-white/[0.08] rounded-2xl px-5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all appearance-none text-zinc-300"
@@ -552,8 +554,8 @@ function ExpensesContent() {
                     </div>
 
                     <div className="p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/10">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500/60 mb-2">Automated Split</p>
-                        <p className="text-xs text-zinc-500 font-medium">This amount will be split equally among all <span className="text-white font-bold">{(selectedGroup?.members.length || 0) + (selectedGroup?.guests?.length || 0)} members</span> of "{selectedGroup?.name}".</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500/60 mb-2">{t('automatedSplit')}</p>
+                        <p className="text-xs text-zinc-500 font-medium">{t('automatedSplitDesc', { count: (selectedGroup?.members.length || 0) + (selectedGroup?.guests?.length || 0), name: selectedGroup?.name || '' })}</p>
                     </div>
 
                     <div className="pt-4 flex gap-4">
@@ -563,10 +565,10 @@ function ExpensesContent() {
                             className="flex-1 h-16 rounded-2xl text-xs font-black uppercase tracking-widest"
                             onClick={() => setIsModalOpen(false)}
                         >
-                            Cancel
+                            {t('cancel')}
                         </Button>
                         <Button type="submit" className="flex-1 h-16 rounded-2xl text-xs font-black uppercase tracking-widest bg-emerald-600 shadow-xl shadow-emerald-500/20">
-                            Log Cost
+                            {t('logCost')}
                         </Button>
                     </div>
                 </form>
@@ -584,18 +586,18 @@ function ExpensesContent() {
             <Modal
                 isOpen={isSettlementModalOpen}
                 onClose={() => setIsSettlementModalOpen(false)}
-                title="Record Settlement"
+                title={t('recordSettlement')}
             >
                 <form onSubmit={onSettlementSubmit} className="space-y-6">
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Who Paid?</label>
+                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">{t('whoPaid')}</label>
                         <select
                             value={settlementPayer}
                             onChange={(e) => setSettlementPayer(e.target.value)}
                             className="w-full h-16 bg-white/[0.03] border border-white/[0.08] rounded-2xl px-5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all appearance-none text-zinc-300"
                             required
                         >
-                            <option value="">Select Payer</option>
+                            <option value="">{t('selectPayer')}</option>
                             {selectedGroup?.members.map(m => (
                                 <option key={m._id} value={m._id}>{m.name}</option>
                             ))}
@@ -606,14 +608,14 @@ function ExpensesContent() {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">To Whom? (Receiver)</label>
+                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">{t('toWhom')}</label>
                         <select
                             value={settlementReceiver}
                             onChange={(e) => setSettlementReceiver(e.target.value)}
                             className="w-full h-16 bg-white/[0.03] border border-white/[0.08] rounded-2xl px-5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all appearance-none text-zinc-300"
                             required
                         >
-                            <option value="">Select Receiver</option>
+                            <option value="">{t('selectReceiver')}</option>
                             {selectedGroup?.members.map(m => (
                                 <option key={m._id} value={m._id}>{m.name}</option>
                             ))}
@@ -624,7 +626,7 @@ function ExpensesContent() {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Amount (৳)</label>
+                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">{t('amountLabel')}</label>
                         <Input
                             type="number"
                             placeholder="0.00"
@@ -642,10 +644,10 @@ function ExpensesContent() {
                             className="flex-1 h-16 rounded-2xl text-xs font-black uppercase tracking-widest"
                             onClick={() => setIsSettlementModalOpen(false)}
                         >
-                            Cancel
+                            {t('cancel')}
                         </Button>
                         <Button type="submit" className="flex-1 h-16 rounded-2xl text-xs font-black uppercase tracking-widest bg-emerald-600 shadow-xl shadow-emerald-500/20">
-                            Confirm Settlement
+                            {t('confirmSettlement')}
                         </Button>
                     </div>
                 </form>
@@ -656,11 +658,12 @@ function ExpensesContent() {
 }
 
 export default function ExpensesPage() {
+    const t = useTranslations('Expenses');
     return (
         <Suspense fallback={
             <div className="h-[60vh] flex flex-col items-center justify-center gap-4 text-zinc-500">
                 <Loader2 className="w-10 h-10 animate-spin text-emerald-500" />
-                <p className="font-bold animate-pulse">Initializing vault...</p>
+                <p className="font-bold animate-pulse">{t('initializingVault')}</p>
             </div>
         }>
             <ExpensesContent />

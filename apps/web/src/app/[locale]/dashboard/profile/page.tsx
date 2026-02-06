@@ -102,30 +102,30 @@ export default function ProfilePage() {
                             <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-500">
                                 <User className="w-6 h-6" />
                             </div>
-                            <h2 className="text-2xl font-black tracking-tighter uppercase text-white">Personal Information</h2>
+                            <h2 className="text-2xl font-black tracking-tighter uppercase text-white">{t('personalInfo.title')}</h2>
                         </div>
 
                         <div className="space-y-6">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Full Name</label>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">{t('personalInfo.fullName')}</label>
                                     <Input defaultValue={user?.name || ""} className="h-16 rounded-2xl border-white/5 bg-white/[0.03] focus:bg-white/[0.05]" />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Display Name</label>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">{t('personalInfo.displayName')}</label>
                                     <Input defaultValue={user?.name?.toLowerCase().replace(' ', '_') || ""} className="h-16 rounded-2xl border-white/5 bg-white/[0.03] focus:bg-white/[0.05]" />
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Email Address</label>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">{t('personalInfo.email')}</label>
                                 <Input defaultValue={user?.email || ""} disabled className="h-16 rounded-2xl border-white/5 bg-white/[0.02] opacity-60 flex items-center gap-3 px-6" />
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Bio</label>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">{t('personalInfo.bio')}</label>
                                 <textarea
-                                    placeholder="Tell us about your travel philosophy..."
+                                    placeholder={t('personalInfo.bioPlaceholder')}
                                     defaultValue="Passionate traveler exploring the hidden gems of Bangladesh. Always ready for a new adventure!"
                                     className="w-full min-h-[120px] bg-white/[0.03] border border-white/[0.08] rounded-[1.5rem] p-6 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all text-zinc-300 resize-none placeholder:text-zinc-700"
                                 />
@@ -144,19 +144,19 @@ export default function ProfilePage() {
                             <div className="p-3 bg-blue-500/10 rounded-2xl text-blue-500">
                                 <Globe className="w-6 h-6" />
                             </div>
-                            <h2 className="text-2xl font-black tracking-tighter uppercase text-white">System Preferences</h2>
+                            <h2 className="text-2xl font-black tracking-tighter uppercase text-white">{t('systemPrefs.title')}</h2>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Language</label>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">{t('systemPrefs.language')}</label>
                                 <select className="w-full h-16 bg-white/[0.03] border border-white/[0.08] rounded-2xl px-6 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20 text-zinc-300 appearance-none">
                                     <option>English (International)</option>
                                     <option>Bengali (Native)</option>
                                 </select>
                             </div>
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Currency</label>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">{t('systemPrefs.currency')}</label>
                                 <select className="w-full h-16 bg-white/[0.03] border border-white/[0.08] rounded-2xl px-6 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20 text-zinc-300 appearance-none">
                                     <option>BDT (৳)</option>
                                     <option>USD ($)</option>

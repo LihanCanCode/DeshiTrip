@@ -10,7 +10,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import api from '@/utils/api';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 
 const groupSchema = z.object({
@@ -36,9 +37,10 @@ interface Group {
     role: 'Admin' | 'Member';
     admin: any;
 }
-
 export default function GroupsPage() {
+    const t = useTranslations('Groups');
     const params = useParams();
+    const router = useRouter();
     const locale = params.locale as string;
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
@@ -114,17 +116,17 @@ export default function GroupsPage() {
         <div className="space-y-10">
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-4xl font-black mb-2">My Groups</h1>
-                    <p className="text-zinc-500">Manage your travel squads and join new adventures.</p>
+                    <h1 className="text-4xl font-black mb-2 tracking-tighter uppercase">{t('title')}</h1>
+                    <p className="text-zinc-500 font-medium">{t('subtitle')}</p>
                 </div>
                 <div className="flex gap-4">
                     <Button variant="outline" onClick={() => setIsJoinModalOpen(true)} className="rounded-2xl h-14" size="lg">
                         <UserPlus className="mr-2 w-5 h-5" />
-                        Join Group
+                        {t('joinGroup')}
                     </Button>
-                    <Button onClick={() => setIsCreateModalOpen(true)} className="rounded-2xl h-14" size="lg">
+                    <Button onClick={() => setIsCreateModalOpen(true)} className="rounded-2xl h-14 shadow-xl shadow-emerald-500/20" size="lg">
                         <Plus className="mr-2 w-5 h-5" />
-                        Create Group
+                        {t('createGroup')}
                     </Button>
                 </div>
             </div>
@@ -141,7 +143,7 @@ export default function GroupsPage() {
             <div className="relative">
                 <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-zinc-500 w-5 h-5" />
                 <input
-                    placeholder="Search groups..."
+                    placeholder={t('searchPlaceholder') || "Search groups..."}
                     className="w-full h-16 bg-white/[0.02] border border-white/5 rounded-[1.5rem] pl-16 pr-6 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all font-medium"
                 />
             </div>
@@ -156,8 +158,8 @@ export default function GroupsPage() {
             ) : groups.length === 0 ? (
                 <div className="glass p-20 rounded-[3rem] border-white/5 bg-white/[0.02] flex flex-col items-center justify-center text-center opacity-60">
                     <Users className="w-16 h-16 mb-6 text-zinc-600" />
-                    <h3 className="text-2xl font-bold text-zinc-400">No groups found</h3>
-                    <p className="max-w-md mt-4 text-zinc-500">You haven't joined any travel groups yet. Create one or join with an invite code to start your adventure!</p>
+                    <h3 className="text-2xl font-bold text-zinc-400">{t('noGroups')}</h3>
+                    <p className="max-w-md mt-4 text-zinc-500">{t('joinGroup')}</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -198,7 +200,7 @@ export default function GroupsPage() {
                                     href={`/${locale}/dashboard/expenses?groupId=${group._id}`}
                                     className="flex items-center gap-2 text-white font-bold text-sm bg-white/5 hover:bg-emerald-500 hover:text-white transition-all px-4 py-2 rounded-xl"
                                 >
-                                    Manage Costs <ArrowRight className="w-4 h-4" />
+                                    {t('manageCosts')} <ArrowRight className="w-4 h-4" />
                                 </Link>
                             </div>
                         </motion.div>
@@ -210,13 +212,13 @@ export default function GroupsPage() {
             <Modal
                 isOpen={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
-                title="Create New Group"
+                title={t('createGroupModal.title')}
             >
                 <form onSubmit={createForm.handleSubmit(onCreateSubmit)} className="space-y-6">
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-zinc-400 ml-1">Group Name</label>
+                        <label className="text-sm font-medium text-zinc-400 ml-1">{t('createGroupModal.groupName')}</label>
                         <Input
-                            placeholder="e.g. Dream Sylhet Tour"
+                            placeholder={t('createGroupModal.placeholderName')}
                             {...createForm.register('name')}
                         />
                         {createForm.formState.errors.name && (
@@ -225,9 +227,9 @@ export default function GroupsPage() {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-zinc-400 ml-1">Description</label>
+                        <label className="text-sm font-medium text-zinc-400 ml-1">{t('createGroupModal.description')}</label>
                         <textarea
-                            placeholder="Short description of your trip..."
+                            placeholder={t('createGroupModal.placeholderDesc')}
                             className="w-full min-h-[120px] bg-white/[0.03] border border-white/[0.08] rounded-2xl p-5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all text-zinc-300 resize-none placeholder:text-zinc-600"
                             {...createForm.register('description')}
                         />
@@ -235,10 +237,10 @@ export default function GroupsPage() {
 
                     {/* Guest Members Section */}
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-zinc-400 ml-1">Add Members (Optional)</label>
+                        <label className="text-sm font-medium text-zinc-400 ml-1">{t('createGroupModal.addMembers')}</label>
                         <div className="flex gap-2">
                             <Input
-                                placeholder="Enter name (e.g. Rahim)"
+                                placeholder={t('createGroupModal.placeholderMember')}
                                 value={guestInput}
                                 onChange={(e) => setGuestInput(e.target.value)}
                                 onKeyDown={(e) => {
@@ -248,7 +250,7 @@ export default function GroupsPage() {
                                     }
                                 }}
                             />
-                            <Button type="button" onClick={addGuest} className="rounded-2xl px-6">Add</Button>
+                            <Button type="button" onClick={addGuest} className="rounded-2xl px-6">{t('createGroupModal.addButton')}</Button>
                         </div>
 
                         {guests.length > 0 && (
@@ -276,10 +278,10 @@ export default function GroupsPage() {
                             className="flex-1 h-14 rounded-2xl"
                             onClick={() => setIsCreateModalOpen(false)}
                         >
-                            Cancel
+                            {t('createGroupModal.cancel')}
                         </Button>
-                        <Button type="submit" className="flex-1 h-14 rounded-2xl">
-                            Create Group
+                        <Button type="submit" className="flex-1 h-14 rounded-2xl bg-emerald-600 text-white hover:bg-emerald-700">
+                            {t('createGroupModal.submit')}
                         </Button>
                     </div>
                 </form>
@@ -289,15 +291,15 @@ export default function GroupsPage() {
             <Modal
                 isOpen={isJoinModalOpen}
                 onClose={() => setIsJoinModalOpen(false)}
-                title="Join a Group"
+                title={t('joinGroupModal.title')}
             >
                 <form onSubmit={joinForm.handleSubmit(onJoinSubmit)} className="space-y-6">
                     <div className="space-y-2 text-center mb-8">
-                        <p className="text-zinc-500 text-sm">Enter the 8-character invite code shared by your group admin.</p>
+                        <p className="text-zinc-500 text-sm">{t('joinGroupModal.subtitle')}</p>
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-zinc-400 ml-1 text-center block">Invite Code</label>
+                        <label className="text-sm font-medium text-zinc-400 ml-1 text-center block">{t('joinGroupModal.inviteCode')}</label>
                         <Input
                             placeholder="e.g. 5F3E2B8A"
                             className="text-center tracking-[0.5em] font-black uppercase text-xl placeholder:tracking-normal placeholder:font-normal placeholder:text-base"
@@ -309,8 +311,8 @@ export default function GroupsPage() {
                     </div>
 
                     <div className="pt-4">
-                        <Button type="submit" className="w-full h-14 rounded-2xl">
-                            Join Journey
+                        <Button type="submit" className="w-full h-14 rounded-2xl bg-emerald-600 text-white hover:bg-emerald-700">
+                            {t('joinGroupModal.submit')}
                         </Button>
                     </div>
                 </form>
