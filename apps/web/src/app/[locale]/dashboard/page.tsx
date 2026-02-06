@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Plus, Users, Calendar, MapPin, TrendingUp, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useParams, useRouter } from 'next/navigation';
+import { cn } from '@/utils/cn';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Modal } from '@/components/ui/Modal';
@@ -105,49 +106,52 @@ export default function DashboardPage() {
     return (
         <div className="space-y-10">
             {/* Header */}
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
-                    <h1 className="text-4xl font-black mb-2 tracking-tighter uppercase">{t('title')}</h1>
+                    <h1 className="text-3xl md:text-4xl font-black mb-2 tracking-tighter uppercase">{t('title')}</h1>
                     <p className="text-zinc-500 font-medium">{t('subtitle')}</p>
                 </div>
-                <Button onClick={() => setIsCreateModalOpen(true)} className="rounded-2xl h-14 px-8 shadow-xl shadow-emerald-500/20" size="lg">
+                <Button onClick={() => setIsCreateModalOpen(true)} className="w-full md:w-auto rounded-2xl h-14 px-8 shadow-xl shadow-emerald-500/20" size="lg">
                     <Plus className="mr-2 w-5 h-5" />
                     {t('newJourney')}
                 </Button>
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[
                     { icon: Users, label: t('stats.activeSquads'), value: activeGroupsCount.toString(), color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
                     { icon: MapPin, label: t('stats.hotspots'), value: stats.spotsExplored.toString(), color: 'text-blue-500', bg: 'bg-blue-500/10' },
-                    { icon: Calendar, label: t('stats.itineraries'), value: stats.plannedTours.toString(), color: 'text-orange-500', bg: 'bg-orange-500/10' },
+                    { icon: Calendar, label: t('stats.itineraries'), value: stats.plannedTours.toString(), color: 'text-orange-500', bg: 'bg-orange-500/10', className: "sm:col-span-2 lg:col-span-1" },
                 ].map((stat, i) => (
-                    <div key={i} className="glass p-8 rounded-[2.5rem] border-white/5 bg-white/[0.02] flex items-center gap-6 group hover:bg-white/[0.04] transition-all">
-                        <div className={`p-5 rounded-2xl ${stat.bg} ${stat.color} transition-transform group-hover:scale-110 duration-500`}>
-                            <stat.icon className="w-8 h-8" />
+                    <div key={i} className={cn(
+                        "glass p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] border-white/5 bg-white/[0.02] flex items-center gap-6 group hover:bg-white/[0.04] transition-all",
+                        stat.className
+                    )}>
+                        <div className={`p-4 md:p-5 rounded-2xl ${stat.bg} ${stat.color} transition-transform group-hover:scale-110 duration-500`}>
+                            <stat.icon className="w-6 h-6 md:w-8 md:h-8" />
                         </div>
                         <div>
                             <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest">{stat.label}</p>
-                            <h3 className="text-4xl font-black mt-1 tracking-tighter">{stat.value}</h3>
+                            <h3 className="text-3xl md:text-4xl font-black mt-1 tracking-tighter">{stat.value}</h3>
                         </div>
                     </div>
                 ))}
             </div>
 
             {/* Main Content Sections */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 text-zinc-500">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 text-zinc-500 pb-10">
                 {/* Active Groups List */}
                 <div className="lg:col-span-2 space-y-6">
                     <div className="flex justify-between items-center px-2">
-                        <h2 className="text-2xl font-black tracking-tighter text-white uppercase">{t('sections.activeSquads')}</h2>
+                        <h2 className="text-xl md:text-2xl font-black tracking-tighter text-white uppercase">{t('sections.activeSquads')}</h2>
                         <Link href={`/${locale}/dashboard/groups`} className="text-emerald-500 text-[10px] font-black uppercase tracking-widest hover:text-white transition-colors">{t('sections.viewAll')}</Link>
                     </div>
 
                     {groups.length === 0 ? (
-                        <div className="glass p-20 rounded-[3rem] border-white/5 bg-white/[0.01] flex flex-col items-center justify-center text-center opacity-40">
-                            <Users className="w-16 h-16 mb-4 text-zinc-600" />
-                            <h3 className="text-lg font-bold uppercase tracking-widest text-zinc-400">{t('noSquads')}</h3>
+                        <div className="glass p-12 md:p-20 rounded-[2.5rem] md:rounded-[3rem] border-white/5 bg-white/[0.01] flex flex-col items-center justify-center text-center opacity-40">
+                            <Users className="w-12 h-12 md:w-16 md:h-16 mb-4 text-zinc-600" />
+                            <h3 className="text-base md:text-lg font-bold uppercase tracking-widest text-zinc-400">{t('noSquads')}</h3>
                             <Link href={`/${locale}/dashboard/groups`} className="mt-4 text-emerald-500 text-xs font-bold hover:underline">{t('startAdventure')} →</Link>
                         </div>
                     ) : (
@@ -158,21 +162,21 @@ export default function DashboardPage() {
                                         initial={{ opacity: 0, x: -20 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         transition={{ delay: i * 0.1 }}
-                                        className="glass p-6 rounded-[2rem] border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-all group flex items-center justify-between"
+                                        className="glass p-4 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-all group flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
                                     >
-                                        <div className="flex items-center gap-6">
-                                            <div className="w-16 h-16 bg-gradient-to-br from-emerald-600 to-teal-800 rounded-[1.5rem] flex items-center justify-center font-black text-2xl shadow-lg shadow-emerald-500/10">
+                                        <div className="flex items-center gap-4 md:gap-6 w-full sm:w-auto">
+                                            <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-emerald-600 to-teal-800 rounded-[1.2rem] md:rounded-[1.5rem] flex items-center justify-center font-black text-xl md:text-2xl shadow-lg shadow-emerald-500/10 shrink-0">
                                                 {group.name[0]}
                                             </div>
-                                            <div>
-                                                <h3 className="text-xl font-bold group-hover:text-emerald-400 transition-colors uppercase tracking-tight">{group.name}</h3>
-                                                <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-zinc-600">
+                                            <div className="min-w-0">
+                                                <h3 className="text-lg md:text-xl font-bold group-hover:text-emerald-400 transition-colors uppercase tracking-tight truncate">{group.name}</h3>
+                                                <div className="flex items-center gap-3 md:gap-4 text-[10px] font-black uppercase tracking-widest text-zinc-600">
                                                     <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> {(group.members?.length || 0) + (group.guests?.length || 0)} members</span>
-                                                    <span className="flex items-center gap-1.5 px-2 py-0.5 bg-white/5 rounded-full">Code: {group.inviteCode}</span>
+                                                    <span className="sm:inline-flex hidden items-center gap-1.5 px-2 py-0.5 bg-white/5 rounded-full">Code: {group.inviteCode}</span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="px-4 py-2 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                                        <div className="self-end sm:self-auto px-4 py-2 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
                                             <span className="text-emerald-500 text-[10px] font-black uppercase tracking-widest">Live</span>
                                         </div>
                                     </motion.div>
@@ -185,25 +189,25 @@ export default function DashboardPage() {
                 {/* Recommendations / Activity */}
                 <div className="space-y-6">
                     <div className="flex justify-between items-center px-2">
-                        <h2 className="text-2xl font-black tracking-tighter text-white uppercase">{t('sections.curatedSpots')}</h2>
+                        <h2 className="text-xl md:text-2xl font-black tracking-tighter text-white uppercase">{t('sections.curatedSpots')}</h2>
                     </div>
                     <div className="space-y-4">
                         {[
                             { spot: 'Ratargul', district: 'Sylhet', image: 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=400&auto=format&fit=crop' },
                             { spot: 'Sundarbans', district: 'Khulna', image: 'https://images.unsplash.com/photo-1623945359620-8049281559ed?w=400&auto=format&fit=crop' },
                         ].map((rec, i) => (
-                            <Link href={`/${locale}/recommend`} key={i} className="block group relative overflow-hidden rounded-[2.5rem] h-56 cursor-pointer border border-white/5 shadow-2xl">
+                            <Link href={`/${locale}/recommend`} key={i} className="block group relative overflow-hidden rounded-[2rem] md:rounded-[2.5rem] h-48 md:h-56 cursor-pointer border border-white/5 shadow-2xl">
                                 <img src={rec.image} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale-[30%] group-hover:grayscale-0" />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
-                                <div className="absolute bottom-8 left-8">
-                                    <h4 className="text-xl font-black tracking-tight uppercase">{rec.spot}</h4>
+                                <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8">
+                                    <h4 className="text-lg md:text-xl font-black tracking-tight uppercase">{rec.spot}</h4>
                                     <p className="text-emerald-500 text-[10px] font-black uppercase tracking-widest flex items-center gap-1 mt-1 opacity-80"><MapPin className="w-3 h-3" /> {rec.district}</p>
                                 </div>
                             </Link>
                         ))}
                     </div>
                     <Link href={`/${locale}/recommend`} className="block">
-                        <Button variant="outline" className="w-full h-16 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] border-white/5 bg-white/[0.01]">
+                        <Button variant="outline" className="w-full h-14 md:h-16 rounded-2xl md:rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] border-white/5 bg-white/[0.01]">
                             {t('sections.exploreAll')}
                         </Button>
                     </Link>

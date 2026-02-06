@@ -22,7 +22,8 @@
         "signUp": "Sign Up",
         "email": "Email",
         "password": "Password",
-        "name": "Full Name"
+        "name": "Full Name",
+        "rememberMe": "Remember Me"
     },
     "Sidebar": {
         "overview": "Overview",

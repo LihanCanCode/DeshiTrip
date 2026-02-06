@@ -16,6 +16,7 @@ import api from '@/utils/api';
 const loginSchema = z.object({
     email: z.string().email('Invalid email address'),
     password: z.string().min(1, 'Password is required'),
+    rememberMe: z.boolean(),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -33,6 +34,9 @@ export function LoginForm() {
         formState: { errors },
     } = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
+        defaultValues: {
+            rememberMe: false,
+        }
     });
 
     const onSubmit = async (data: LoginFormValues) => {
@@ -41,8 +45,12 @@ export function LoginForm() {
         try {
             const response = await api.post('/auth/login', data);
             const { token, user } = response.data;
-            localStorage.setItem('token', token);
-            localStorage.setItem('user', JSON.stringify(user));
+
+            // Handle persistence based on Remember Me
+            const storage = data.rememberMe ? localStorage : sessionStorage;
+            storage.setItem('token', token);
+            storage.setItem('user', JSON.stringify(user));
+
             router.push(`/${params.locale}/recommend`);
         } catch (error: unknown) {
             const err = error as { response?: { data?: { message?: string } } };
@@ -83,7 +91,6 @@ export function LoginForm() {
                 <div className="space-y-2">
                     <div className="flex justify-between items-center ml-1">
                         <label className="text-sm font-medium text-zinc-400">{t('password')}</label>
-                        <Link href="#" className="text-xs text-emerald-500 hover:underline">Forgot password?</Link>
                     </div>
                     <div className="relative group">
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 group-focus-within:text-emerald-500 transition-colors" />
@@ -97,7 +104,33 @@ export function LoginForm() {
                     {errors.password && <p className="text-xs text-red-500 ml-1">{errors.password.message}</p>}
                 </div>
 
-                <Button className="w-full group" size="lg" disabled={isLoading}>
+                <div className="flex items-center justify-between px-1">
+                    <label className="flex items-center gap-2 cursor-pointer group">
+                        <div className="relative flex items-center">
+                            <input
+                                type="checkbox"
+                                className="peer sr-only"
+                                {...register('rememberMe')}
+                            />
+                            <div className="w-5 h-5 rounded-md border-2 border-white/10 bg-white/5 peer-checked:bg-emerald-500 peer-checked:border-emerald-500 transition-all" />
+                            <svg
+                                className="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 left-1 transition-opacity pointer-events-none"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        <span className="text-xs font-bold text-zinc-500 group-hover:text-zinc-300 transition-colors">
+                            {t('rememberMe')}
+                        </span>
+                    </label>
+                    <Link href="#" className="text-xs text-emerald-500 hover:underline">{t('forgotPassword') || 'Forgot password?'}</Link>
+                </div>
+
+                <Button className="w-full group h-14 rounded-2xl" size="lg" disabled={isLoading}>
                     {isLoading ? 'Logging in...' : t('login')}
                     {!isLoading && <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />}
                 </Button>

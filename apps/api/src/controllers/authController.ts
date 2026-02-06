@@ -39,7 +39,7 @@ export const register = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, rememberMe } = req.body;
 
         const user = await User.findOne({ email });
         if (!user) {
@@ -51,7 +51,10 @@ export const login = async (req: Request, res: Response) => {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        const token = generateToken({ id: user._id, role: user.role });
+        const token = generateToken(
+            { id: user._id, role: user.role },
+            rememberMe ? '30d' : '1d'
+        );
         res.json({ user: { id: user._id, name: user.name, email: user.email }, token });
     } catch (error: any) {
         res.status(500).json({ message: error.message });

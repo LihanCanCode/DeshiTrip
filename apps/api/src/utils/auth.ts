@@ -11,8 +11,8 @@ export const verifyPassword = async (password: string, hash: string): Promise<bo
     return await argon2.verify(hash, password);
 };
 
-export const generateToken = (payload: any): string => {
-    return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+export const generateToken = (payload: any, expiresIn: any = '7d'): string => {
+    return jwt.sign(payload, JWT_SECRET, { expiresIn });
 };
 
 export const verifyToken = (token: string): any => {

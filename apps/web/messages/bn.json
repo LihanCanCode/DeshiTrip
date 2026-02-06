@@ -22,7 +22,8 @@
         "signUp": "সাইন আপ",
         "email": "ইমেইল",
         "password": "পাসওয়ার্ড",
-        "name": "পুরো নাম"
+        "name": "পুরো নাম",
+        "rememberMe": "আমাকে মনে রাখুন"
     },
     "Sidebar": {
         "overview": "ওভারভিউ",

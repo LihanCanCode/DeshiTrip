@@ -184,23 +184,23 @@ export default function RecommendPage() {
                 onClose={() => setIsModalOpen(false)}
             />
 
-            <div className="flex flex-col h-full gap-8">
-                <div className="flex justify-between items-end">
+            <div className="flex flex-col h-full gap-6 md:gap-8">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
                     <div>
                         <div className="flex items-center gap-2 text-emerald-500 mb-2">
                             <Sparkles className="w-5 h-5" />
                             <span className="text-sm font-bold uppercase tracking-widest">{t('aiRecommendation')}</span>
                         </div>
-                        <h1 className="text-4xl font-black">{t('title')}</h1>
-                        <p className="text-zinc-500 mt-2">{t('subtitle')}</p>
+                        <h1 className="text-3xl md:text-4xl font-black">{t('title')}</h1>
+                        <p className="text-zinc-500 mt-2 text-sm md:text-base">{t('subtitle')}</p>
                     </div>
 
-                    <div className="flex gap-4">
-                        <div className="relative w-80">
+                    <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+                        <div className="relative flex-1 md:w-80">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
                             <Input
                                 placeholder={t('searchPlaceholder')}
-                                className="pl-12 h-14"
+                                className="pl-12 h-14 w-full"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
@@ -208,15 +208,15 @@ export default function RecommendPage() {
                                 <div className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
                             )}
                         </div>
-                        <Button variant="outline" className="h-14">
+                        <Button variant="outline" className="h-14 shrink-0">
                             <Filter className="mr-2 w-5 h-5" />
                             {t('filters')}
                         </Button>
                     </div>
                 </div>
 
-                <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-8 min-h-0">
-                    <div className="lg:col-span-1 space-y-6 overflow-y-auto pr-2 custom-scrollbar">
+                <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6 md:gap-8 min-h-0 overflow-y-auto lg:overflow-visible pb-10">
+                    <div className="lg:col-span-1 space-y-6 lg:overflow-y-auto pr-0 lg:pr-2 custom-scrollbar order-2 lg:order-1">
                         <h3 className="text-lg font-bold flex items-center gap-2">
                             {searchQuery.length > 2 ? t('searchResults') : t('topDestinations')}
                         </h3>
@@ -281,7 +281,7 @@ export default function RecommendPage() {
                         </div>
                     </div>
 
-                    <div className="lg:col-span-3 min-h-[500px]">
+                    <div className="lg:col-span-3 min-h-[400px] md:min-h-[500px] order-1 lg:order-2">
                         <TravelMap
                             spots={displaySpots as any}
                             selectedSpot={selectedSpot}

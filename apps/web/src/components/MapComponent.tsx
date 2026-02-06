@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap, GeoJSON } from 'react-l
 import 'leaflet/dist/leaflet.css';
 import { Icon } from 'leaflet';
 import { useEffect } from 'react';
+import { FeatureCollection, Feature, Geometry } from 'geojson';
 
 // Fix for default marker icons
 const defaultIcon = new Icon({
@@ -24,18 +25,18 @@ const userIcon = new Icon({
     shadowSize: [41, 41]
 });
 
-interface Spot {
+export interface Spot {
     _id: string;
     name: { en: string; bn: string };
     location: { coordinates: [number, number] };
 }
 
-interface LeafletMapProps {
+interface MapComponentProps {
     spots: Spot[];
     selectedSpot: Spot | null;
     userLocation: [number, number] | null;
-    routeData: any;
-    allRoutes: Record<string, any>;
+    routeData: FeatureCollection | Feature | Geometry | null;
+    allRoutes: Record<string, FeatureCollection | Feature | Geometry>;
 }
 
 // Component to handle FlyTo animation
@@ -53,7 +54,7 @@ const FlyToSpot = ({ spot }: { spot: Spot | null }) => {
     return null;
 };
 
-export default function LeafletMap({ spots, selectedSpot, userLocation, routeData, allRoutes }: LeafletMapProps) {
+export default function MapComponent({ spots, selectedSpot, userLocation, routeData, allRoutes }: MapComponentProps) {
     const defaultCenter: [number, number] = [23.8103, 90.4125]; // Center of Bangladesh (Dhaka)
     const zoom = 7;
 
@@ -99,7 +100,7 @@ export default function LeafletMap({ spots, selectedSpot, userLocation, routeDat
                 return (
                     <GeoJSON
                         key={`bg-route-${spotId}`}
-                        data={data as any}
+                        data={data}
                         style={{ color: '#10b981', weight: 4, opacity: 0.25 }}
                     />
                 );
@@ -108,19 +109,17 @@ export default function LeafletMap({ spots, selectedSpot, userLocation, routeDat
             {/* ACTIVE SELECT ROUTE - Rendered ON TOP with high contrast */}
             {routeData && (
                 <GeoJSON
-                    key={`active-route-${selectedSpot?._id}-${JSON.stringify(routeData.properties?.summary)}`}
-                    data={routeData as any}
+                    key={`active-route-${selectedSpot?._id}`}
+                    data={routeData}
                     style={{ color: '#ffffff', weight: 7, opacity: 1, dashArray: '1, 12', lineCap: 'round' }}
-                >
-                    {/* Outer glow effect via a second GeoJSON layer below if we wanted, but dashArray is cleaner for "active" look */}
-                </GeoJSON>
+                />
             )}
 
             {/* Solid line below the dashed line for better visibility */}
             {routeData && (
                 <GeoJSON
                     key={`active-route-solid-${selectedSpot?._id}`}
-                    data={routeData as any}
+                    data={routeData}
                     style={{ color: '#10b981', weight: 8, opacity: 0.8 }}
                 />
             )}
