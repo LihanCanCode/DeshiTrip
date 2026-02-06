@@ -3,7 +3,19 @@
         "title": "দেশিট্রিপ",
         "description": "বাংলাদেশের লুকানো রত্নগুলো আবিষ্কার করুন",
         "getStarted": "শুরু করুন",
-        "exploreSpots": "দর্শনীয় স্থান দেখুন"
+        "exploreSpots": "দর্শনীয় স্থান দেখুন",
+        "explore": "এক্সপ্লোর",
+        "features": {
+            "tripPlanning": "ভ্রমণ পরিকল্পনা",
+            "localSpots": "স্থানীয় স্থান",
+            "groupTours": "গ্রুপ ট্যুর",
+            "expenseTracking": "খরচ ট্র্যাকিং",
+            "description": "আপনার ভ্রমণের অভিজ্ঞতা পরিচালনার সবচেয়ে সহজ উপায়।"
+        }
+    },
+    "Logo": {
+        "deshi": "দেশি",
+        "trip": "ট্রিপ"
     },
     "Auth": {
         "login": "লগইন",
@@ -11,5 +23,57 @@
         "email": "ইমেইল",
         "password": "পাসওয়ার্ড",
         "name": "পুরো নাম"
+    },
+    "Sidebar": {
+        "overview": "ওভারভিউ",
+        "myGroups": "আমার গ্রুপ",
+        "exploreSpots": "স্পট এক্সপ্লোর",
+        "community": "কমিউনিটি",
+        "expenses": "খরচাপাতি",
+        "settings": "সেটিংস",
+        "logout": "লগআউট"
+    },
+    "Dashboard": {
+        "title": "আমার হাব",
+        "subtitle": "আপনার পরবর্তী ভ্রমণের জন্য প্রস্তুত, ভ্রমনকারী?",
+        "newJourney": "নতুন যাত্রা",
+        "stats": {
+            "activeSquads": "সক্রিয় স্কোয়াড",
+            "hotspots": "হটস্পট",
+            "itineraries": "ভ্রমণসূচী"
+        },
+        "sections": {
+            "activeSquads": "সক্রিয় স্কোয়াড",
+            "curatedSpots": "নির্বাচিত স্পট",
+            "viewAll": "সব দেখুন",
+            "exploreAll": "সব স্পট দেখুন"
+        },
+        "noSquads": "কোন স্কোয়াডে যোগ দেননি",
+        "startAdventure": "ভ্রমণ শুরু করুন"
+    },
+    "Settings": {
+        "title": "সেটিংস",
+        "subtitle": "আপনার প্রোফাইল এবং অ্যাকাউন্ট পছন্দগুলো পরিচালনা করুন",
+        "saveChanges": "পরিবর্তন সংরক্ষণ করুন",
+        "explorerSince": "{year} থেকে এক্সপ্লোরার",
+        "sections": {
+            "profile": "প্রোফাইল তথ্য",
+            "notifications": "নোটিফিকেশন",
+            "security": "নিরাপত্তা",
+            "about": "সম্পর্কে"
+        },
+        "personalInfo": {
+            "title": "ব্যগত তথ্য",
+            "fullName": "পুরো নাম",
+            "displayName": "প্রদর্শিত নাম",
+            "email": "ইমেইল ঠিকানা",
+            "bio": "বায়ো",
+            "bioPlaceholder": "আপনার ভ্রমণের দর্শন সম্পর্কে আমাদের বলুন..."
+        },
+        "systemPrefs": {
+            "title": "সিস্টেম পছন্দসমূহ",
+            "language": "ভাষা",
+            "currency": "কারেন্সি"
+        }
     }
 }

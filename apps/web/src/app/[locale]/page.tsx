@@ -16,8 +16,8 @@ export default function Home({ params }: { params: { locale: string } }) {
       <section className="container mx-auto px-6 pt-20 pb-32 text-center relative z-10">
         <div className="transition-all duration-1000">
           <h1 className="text-6xl md:text-8xl font-black mb-8 leading-tight tracking-tighter">
-            <span className="text-white">{t('title').substring(0, 5)}</span>
-            <span className="text-emerald-500">Trip</span>
+            <span className="text-white">{params.locale === 'en' ? 'Deshi' : 'দেশি'}</span>
+            <span className="text-emerald-500">{params.locale === 'en' ? 'Trip' : 'ট্রিপ'}</span>
           </h1>
           <p className="text-xl md:text-2xl text-zinc-400 max-w-2xl mx-auto mb-12 leading-relaxed">
             {t('description')}

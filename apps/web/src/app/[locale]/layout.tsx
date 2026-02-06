@@ -9,6 +9,15 @@ export const metadata: Metadata = {
   description: "Your ultimate travel companion for discovering the beauty of Bangladesh.",
 };
 
+import { Outfit } from "next/font/google";
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-outfit",
+  weight: ["300", "400", "500", "600", "700", "800"],
+  display: 'swap',
+});
+
 const locales = ['en', 'bn'];
 
 export default async function RootLayout({
@@ -23,11 +32,17 @@ export default async function RootLayout({
 
   // Providing all messages to the client
   // side is the easiest way to get started
-  const messages = await getMessages();
+  const messages = await getMessages({ locale });
 
   return (
-    <NextIntlClientProvider messages={messages}>
-      {children}
-    </NextIntlClientProvider>
+    <html lang={locale}>
+      <body
+        className={`${outfit.variable} antialiased selection:bg-emerald-500 selection:text-white bg-[#0a0f0d]`}
+      >
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          {children}
+        </NextIntlClientProvider>
+      </body>
+    </html>
   );
 }

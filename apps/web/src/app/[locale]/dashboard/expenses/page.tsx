@@ -270,6 +270,19 @@ function ExpensesContent() {
         );
     }
 
+    if (error) {
+        return (
+            <div className="glass p-20 rounded-[3rem] border-red-500/10 bg-red-500/5 flex flex-col items-center justify-center text-center">
+                <AlertCircle className="w-16 h-16 mb-6 text-red-500" />
+                <h3 className="text-2xl font-bold text-red-500">Connection Error</h3>
+                <p className="max-w-md mt-4 text-zinc-500 mb-8">{error}. Please make sure the API server is running on port 8000.</p>
+                <Button onClick={() => window.location.reload()} className="rounded-2xl h-14">
+                    Retry Connection
+                </Button>
+            </div>
+        );
+    }
+
     if (groups.length === 0) {
         return (
             <div className="glass p-20 rounded-[3rem] border-white/5 bg-white/[0.02] flex flex-col items-center justify-center text-center">

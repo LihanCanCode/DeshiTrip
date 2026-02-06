@@ -1,5 +1,6 @@
 import { Plane } from "lucide-react";
 import { cn } from "@/utils/cn";
+import { useTranslations } from 'next-intl';
 
 interface LogoProps {
     className?: string;
@@ -7,6 +8,7 @@ interface LogoProps {
 }
 
 export const Logo = ({ className, showText = true }: LogoProps) => {
+    const t = useTranslations('Logo');
     return (
         <div className={cn("flex items-center gap-2", className)}>
             <div className="relative">
@@ -17,7 +19,7 @@ export const Logo = ({ className, showText = true }: LogoProps) => {
             </div>
             {showText && (
                 <span className="text-xl font-bold tracking-tight">
-                    Deshi<span className="text-emerald-500">Trip</span>
+                    {t('deshi')}<span className="text-emerald-500">{t('trip')}</span>
                 </span>
             )}
         </div>

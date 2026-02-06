@@ -5,7 +5,10 @@ import { Plane, MapPin, Users, Wallet } from 'lucide-react';
 import { Logo } from '@/components/Logo';
 import Link from 'next/link';
 
+import { useTranslations } from 'next-intl';
+
 export function HomeNav({ locale }: { locale: string }) {
+    const t = useTranslations('Index');
     return (
         <nav className="container mx-auto px-6 py-8 flex justify-between items-center relative z-10">
             <motion.div
@@ -15,13 +18,13 @@ export function HomeNav({ locale }: { locale: string }) {
                 <Logo />
             </motion.div>
             <div className="flex gap-8 items-center">
-                <Link href="/en" className="hover:text-emerald-400 transition-colors">EN</Link>
-                <Link href="/bn" className="hover:text-emerald-400 transition-colors">বাংলা</Link>
+                <Link href="/en" className="hover:text-emerald-400 transition-colors font-bold">EN</Link>
+                <Link href="/bn" className="hover:text-emerald-400 transition-colors font-bold">বাংলা</Link>
                 <Link
                     href={`/${locale}/recommend`}
-                    className="bg-emerald-600 hover:bg-emerald-500 px-6 py-2 rounded-full font-medium transition-all transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(16,185,129,0.3)] inline-block text-white"
+                    className="bg-emerald-600 hover:bg-emerald-500 px-6 py-2 rounded-full font-bold transition-all transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(16,185,129,0.3)] inline-block text-white"
                 >
-                    Explore
+                    {t('explore')}
                 </Link>
             </div>
         </nav>
@@ -29,11 +32,12 @@ export function HomeNav({ locale }: { locale: string }) {
 }
 
 export function FeatureCards() {
+    const t = useTranslations('Index.features');
     const features = [
-        { icon: Plane, label: 'Trip Planning', color: 'text-blue-400' },
-        { icon: MapPin, label: 'Local Spots', color: 'text-emerald-400' },
-        { icon: Users, label: 'Group Tours', color: 'text-orange-400' },
-        { icon: Wallet, label: 'Expense Tracking', color: 'text-purple-400' },
+        { icon: Plane, label: t('tripPlanning'), color: 'text-blue-400' },
+        { icon: MapPin, label: t('localSpots'), color: 'text-emerald-400' },
+        { icon: Users, label: t('groupTours'), color: 'text-orange-400' },
+        { icon: Wallet, label: t('expenseTracking'), color: 'text-purple-400' },
     ];
 
     return (
@@ -49,8 +53,8 @@ export function FeatureCards() {
                         className="bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-[2rem] hover:border-emerald-500/50 transition-all group"
                     >
                         <feature.icon className={`w-12 h-12 mb-6 ${feature.color} group-hover:scale-110 transition-transform`} />
-                        <h3 className="text-xl font-bold mb-2">{feature.label}</h3>
-                        <p className="text-zinc-500">The most intuitive way to manage your travel experience.</p>
+                        <h3 className="text-xl font-bold mb-2 uppercase tracking-tight">{feature.label}</h3>
+                        <p className="text-zinc-500 text-sm">{t('description')}</p>
                     </motion.div>
                 ))}
             </div>

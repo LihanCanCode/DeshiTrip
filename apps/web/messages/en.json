@@ -3,7 +3,19 @@
         "title": "DeshiTrip",
         "description": "Discover the hidden gems of Bangladesh",
         "getStarted": "Get Started",
-        "exploreSpots": "Explore Spots"
+        "exploreSpots": "Explore Spots",
+        "explore": "Explore",
+        "features": {
+            "tripPlanning": "Trip Planning",
+            "localSpots": "Local Spots",
+            "groupTours": "Group Tours",
+            "expenseTracking": "Expense Tracking",
+            "description": "The most intuitive way to manage your travel experience."
+        }
+    },
+    "Logo": {
+        "deshi": "Deshi",
+        "trip": "Trip"
     },
     "Auth": {
         "login": "Login",
@@ -11,5 +23,57 @@
         "email": "Email",
         "password": "Password",
         "name": "Full Name"
+    },
+    "Sidebar": {
+        "overview": "Overview",
+        "myGroups": "My Groups",
+        "exploreSpots": "Explore Spots",
+        "community": "Community",
+        "expenses": "Expenses",
+        "settings": "Settings",
+        "logout": "Logout"
+    },
+    "Dashboard": {
+        "title": "My Hub",
+        "subtitle": "Ready for your next trip, Traveler?",
+        "newJourney": "New Journey",
+        "stats": {
+            "activeSquads": "Active Squads",
+            "hotspots": "Hotspots",
+            "itineraries": "Itineraries"
+        },
+        "sections": {
+            "activeSquads": "Active Squads",
+            "curatedSpots": "Curated Spots",
+            "viewAll": "View All",
+            "exploreAll": "Explore All Spots"
+        },
+        "noSquads": "No Squads Joined",
+        "startAdventure": "Start an Adventure"
+    },
+    "Settings": {
+        "title": "Settings",
+        "subtitle": "Manage your profile and account preferences",
+        "saveChanges": "Save Changes",
+        "explorerSince": "Explorer since {year}",
+        "sections": {
+            "profile": "Profile Information",
+            "notifications": "Notifications",
+            "security": "Security",
+            "about": "About"
+        },
+        "personalInfo": {
+            "title": "Personal Information",
+            "fullName": "Full Name",
+            "displayName": "Display Name",
+            "email": "Email Address",
+            "bio": "Bio",
+            "bioPlaceholder": "Tell us about your travel philosophy..."
+        },
+        "systemPrefs": {
+            "title": "System Preferences",
+            "language": "Language",
+            "currency": "Currency"
+        }
     }
 }

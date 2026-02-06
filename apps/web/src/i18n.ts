@@ -5,12 +5,9 @@ import { notFound } from 'next/navigation';
 const locales = ['en', 'bn'];
 
 export default getRequestConfig(async ({ locale: rawLocale }) => {
-    // In some App Router scenarios (like global error handling), 
-    // the locale might be undefined. Default to 'en' to handle these cases.
     const locale = rawLocale || 'en';
 
-    // Validate that the detected locale is supported
-    if (!(locales as string[]).includes(locale)) notFound();
+    if (!locales.includes(locale as any)) notFound();
 
     return {
         locale,

@@ -4,22 +4,24 @@ import { motion } from 'framer-motion';
 import { LayoutDashboard, Users, Map, Wallet, Settings, LogOut, Globe } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, usePathname, useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/utils/cn';
 import { Logo } from './Logo';
 
 export const DashboardSidebar = () => {
+    const t = useTranslations('Sidebar');
     const pathname = usePathname();
     const router = useRouter();
     const params = useParams();
-    const locale = params.locale as string;
+    const locale = (params.locale as string) || 'en';
 
     const menuItems = [
-        { icon: LayoutDashboard, label: 'Overview', href: `/${locale}/dashboard` },
-        { icon: Users, label: 'My Groups', href: `/${locale}/dashboard/groups` },
-        { icon: Map, label: 'Explore Spots', href: `/${locale}/recommend` },
-        { icon: Globe, label: 'Community', href: `/${locale}/community` },
-        { icon: Wallet, label: 'Expenses', href: `/${locale}/dashboard/expenses` },
-        { icon: Settings, label: 'Settings', href: `/${locale}/dashboard/profile` },
+        { icon: LayoutDashboard, label: t('overview'), href: `/${locale}/dashboard` },
+        { icon: Users, label: t('myGroups'), href: `/${locale}/dashboard/groups` },
+        { icon: Map, label: t('exploreSpots'), href: `/${locale}/recommend` },
+        { icon: Globe, label: t('community'), href: `/${locale}/community` },
+        { icon: Wallet, label: t('expenses'), href: `/${locale}/dashboard/expenses` },
+        { icon: Settings, label: t('settings'), href: `/${locale}/dashboard/profile` },
     ];
 
     const handleLogout = () => {
@@ -64,7 +66,7 @@ export const DashboardSidebar = () => {
                 className="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-zinc-500 hover:text-red-400 hover:bg-red-400/5 transition-all group mt-auto"
             >
                 <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                <span className="font-bold text-sm tracking-wide">Logout</span>
+                <span className="font-bold text-sm tracking-wide">{t('logout')}</span>
             </button>
         </aside>
     );

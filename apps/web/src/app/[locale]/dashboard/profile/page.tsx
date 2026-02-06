@@ -6,8 +6,10 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 
 export default function ProfilePage() {
+    const t = useTranslations('Settings');
     const params = useParams();
     const locale = params.locale as string;
     const [isSaving, setIsSaving] = useState(false);
@@ -31,15 +33,15 @@ export default function ProfilePage() {
         setIsSaving(false);
     };
 
-    const initials = user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'JD';
+    const initials = user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').toUpperCase() : 'JD';
 
     return (
         <div className="max-w-4xl mx-auto space-y-10 pb-20">
             {/* Header */}
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-4xl font-black mb-2 tracking-tighter uppercase">Settings</h1>
-                    <p className="text-zinc-500 font-medium">Manage your profile and account preferences</p>
+                    <h1 className="text-4xl font-black mb-2 tracking-tighter uppercase">{t('title')}</h1>
+                    <p className="text-zinc-500 font-medium">{t('subtitle')}</p>
                 </div>
                 <Button
                     onClick={handleSave}
@@ -47,7 +49,7 @@ export default function ProfilePage() {
                     className="rounded-2xl h-14 px-8 shadow-xl shadow-emerald-500/20"
                 >
                     <Save className="mr-2 w-5 h-5" />
-                    Save Changes
+                    {t('saveChanges')}
                 </Button>
             </div>
 
@@ -64,15 +66,15 @@ export default function ProfilePage() {
                             </button>
                         </div>
                         <h3 className="text-xl font-bold uppercase tracking-tight">{user?.name || 'Guest Explorer'}</h3>
-                        <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mt-1">Explorer since 2024</p>
+                        <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mt-1">{t('explorerSince', { year: '2024' })}</p>
                     </div>
 
                     <div className="glass p-4 rounded-[2rem] border-white/5 bg-white/[0.01] space-y-2">
                         {[
-                            { icon: User, label: 'Profile Information', active: true },
-                            { icon: Bell, label: 'Notifications', active: false },
-                            { icon: Lock, label: 'Security', active: false },
-                            { icon: Info, label: 'About', active: false },
+                            { icon: User, label: t('sections.profile'), active: true },
+                            { icon: Bell, label: t('sections.notifications'), active: false },
+                            { icon: Lock, label: t('sections.security'), active: false },
+                            { icon: Info, label: t('sections.about'), active: false },
                         ].map((item, i) => (
                             <button
                                 key={i}

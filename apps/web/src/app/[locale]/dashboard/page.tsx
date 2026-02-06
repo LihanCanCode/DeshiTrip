@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/Input';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { useTranslations } from 'next-intl';
 import api from '@/utils/api';
 
 const groupSchema = z.object({
@@ -21,6 +22,7 @@ const groupSchema = z.object({
 type GroupFormValues = z.infer<typeof groupSchema>;
 
 export default function DashboardPage() {
+    const t = useTranslations('Dashboard');
     const params = useParams();
     const router = useRouter();
     const locale = params.locale as string;
@@ -105,21 +107,21 @@ export default function DashboardPage() {
             {/* Header */}
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-4xl font-black mb-2 tracking-tighter">MY Hub</h1>
-                    <p className="text-zinc-500 font-medium">Ready for your next trip, Traveler?</p>
+                    <h1 className="text-4xl font-black mb-2 tracking-tighter uppercase">{t('title')}</h1>
+                    <p className="text-zinc-500 font-medium">{t('subtitle')}</p>
                 </div>
                 <Button onClick={() => setIsCreateModalOpen(true)} className="rounded-2xl h-14 px-8 shadow-xl shadow-emerald-500/20" size="lg">
                     <Plus className="mr-2 w-5 h-5" />
-                    New Journey
+                    {t('newJourney')}
                 </Button>
             </div>
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {[
-                    { icon: Users, label: 'Active Squads', value: activeGroupsCount.toString(), color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-                    { icon: MapPin, label: 'Hotspots', value: stats.spotsExplored.toString(), color: 'text-blue-500', bg: 'bg-blue-500/10' },
-                    { icon: Calendar, label: 'Itineraries', value: stats.plannedTours.toString(), color: 'text-orange-500', bg: 'bg-orange-500/10' },
+                    { icon: Users, label: t('stats.activeSquads'), value: activeGroupsCount.toString(), color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+                    { icon: MapPin, label: t('stats.hotspots'), value: stats.spotsExplored.toString(), color: 'text-blue-500', bg: 'bg-blue-500/10' },
+                    { icon: Calendar, label: t('stats.itineraries'), value: stats.plannedTours.toString(), color: 'text-orange-500', bg: 'bg-orange-500/10' },
                 ].map((stat, i) => (
                     <div key={i} className="glass p-8 rounded-[2.5rem] border-white/5 bg-white/[0.02] flex items-center gap-6 group hover:bg-white/[0.04] transition-all">
                         <div className={`p-5 rounded-2xl ${stat.bg} ${stat.color} transition-transform group-hover:scale-110 duration-500`}>
@@ -138,15 +140,15 @@ export default function DashboardPage() {
                 {/* Active Groups List */}
                 <div className="lg:col-span-2 space-y-6">
                     <div className="flex justify-between items-center px-2">
-                        <h2 className="text-2xl font-black tracking-tighter text-white uppercase">Active Squads</h2>
-                        <Link href={`/${locale}/dashboard/groups`} className="text-emerald-500 text-[10px] font-black uppercase tracking-widest hover:text-white transition-colors">View All</Link>
+                        <h2 className="text-2xl font-black tracking-tighter text-white uppercase">{t('sections.activeSquads')}</h2>
+                        <Link href={`/${locale}/dashboard/groups`} className="text-emerald-500 text-[10px] font-black uppercase tracking-widest hover:text-white transition-colors">{t('sections.viewAll')}</Link>
                     </div>
 
                     {groups.length === 0 ? (
                         <div className="glass p-20 rounded-[3rem] border-white/5 bg-white/[0.01] flex flex-col items-center justify-center text-center opacity-40">
                             <Users className="w-16 h-16 mb-4 text-zinc-600" />
-                            <h3 className="text-lg font-bold uppercase tracking-widest text-zinc-400">No Squads Joined</h3>
-                            <Link href={`/${locale}/dashboard/groups`} className="mt-4 text-emerald-500 text-xs font-bold hover:underline">Start an Adventure →</Link>
+                            <h3 className="text-lg font-bold uppercase tracking-widest text-zinc-400">{t('noSquads')}</h3>
+                            <Link href={`/${locale}/dashboard/groups`} className="mt-4 text-emerald-500 text-xs font-bold hover:underline">{t('startAdventure')} →</Link>
                         </div>
                     ) : (
                         <div className="space-y-4">
@@ -183,7 +185,7 @@ export default function DashboardPage() {
                 {/* Recommendations / Activity */}
                 <div className="space-y-6">
                     <div className="flex justify-between items-center px-2">
-                        <h2 className="text-2xl font-black tracking-tighter text-white uppercase">Curated Spots</h2>
+                        <h2 className="text-2xl font-black tracking-tighter text-white uppercase">{t('sections.curatedSpots')}</h2>
                     </div>
                     <div className="space-y-4">
                         {[
@@ -202,7 +204,7 @@ export default function DashboardPage() {
                     </div>
                     <Link href={`/${locale}/recommend`} className="block">
                         <Button variant="outline" className="w-full h-16 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] border-white/5 bg-white/[0.01]">
-                            Explore All Spots
+                            {t('sections.exploreAll')}
                         </Button>
                     </Link>
                 </div>
