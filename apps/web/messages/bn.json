@@ -23,7 +23,8 @@
         "email": "ইমেইল",
         "password": "পাসওয়ার্ড",
         "name": "পুরো নাম",
-        "rememberMe": "আমাকে মনে রাখুন"
+        "rememberMe": "আমাকে মনে রাখুন",
+        "forgotPassword": "পাসওয়ার্ড ভুলে গেছেন?"
     },
     "Sidebar": {
         "overview": "ওভারভিউ",
@@ -124,7 +125,8 @@
         "owes": "ঋণী",
         "connectionError": "লিংক সমস্যা",
         "connectionDesc": "{error}। দয়া করে নিশ্চিত করুন যে এপিআই সার্ভারটি ৮০০০ পোর্টে চলছে।",
-        "retry": "আবার চেষ্টা করুন"
+        "retry": "আবার চেষ্টা করুন",
+        "savedOffline": "অফলাইনে সংরক্ষিত হয়েছে। অনলাইনে আসলে সিঙ্ক হবে।"
     },
     "Groups": {
         "title": "আমার গ্রুপ",
@@ -135,6 +137,8 @@
         "joinGroupDesc": "শুরু করতে একটি গ্রুপে যোগ দিন!",
         "manageCosts": "খরচ পরিচালনা করুন",
         "searchPlaceholder": "গ্রুপ খুঁজুন...",
+        "noOfflineData": "কোন অফলাইন ডেটা নেই",
+        "offlineMode": "অফলাইন ডেটা দেখা হচ্ছে",
         "createGroupModal": {
             "title": "নতুন গ্রুপ তৈরি করুন",
             "groupName": "গ্রুপের নাম",

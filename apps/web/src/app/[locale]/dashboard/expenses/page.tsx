@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from 'framer-motion';
-import { Wallet, Plus, ArrowUpRight, ArrowDownLeft, PieChart, Users, TrendingUp, AlertCircle, Loader2 } from 'lucide-react';
+import { Wallet, Plus, ArrowUpRight, ArrowDownLeft, PieChart, Users, TrendingUp, AlertCircle, Loader2, WifiOff } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
@@ -14,6 +14,8 @@ import * as z from 'zod';
 import { useSearchParams, useRouter, useParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import api from '@/utils/api';
+import { isOnline, saveToCache, getFromCache, addToOutbox, getOutbox, removeFromOutbox } from '@/utils/offline';
+import { calculateSettlements } from '@/utils/settlements';
 
 const expenseSchema = z.object({
     description: z.string().min(3, 'Description must be at least 3 characters'),
@@ -34,6 +36,8 @@ interface Expense {
         _id: string;
         name: string;
     };
+    payerGuestName?: string;
+    splitBetween?: { user?: string; guestName?: string; amount: number }[];
     date: string;
     createdAt: string;
 }
@@ -81,80 +85,182 @@ function ExpensesContent() {
         const fetchInitialData = async () => {
             try {
                 setLoading(true);
-                const groupsRes = await api.get('/groups');
-                setGroups(groupsRes.data);
+                let currentGroups: Group[] = [];
 
+                if (isOnline()) {
+                    try {
+                        const groupsRes = await api.get('/groups');
+                        currentGroups = groupsRes.data;
+                        setGroups(currentGroups);
+                        saveToCache('groups', currentGroups);
+                        setError(null);
+                    } catch (apiErr) {
+                        console.error('API Fetch failed, falling back to cache');
+                        currentGroups = getFromCache('groups') || [];
+                        setGroups(currentGroups);
+                    }
+                } else {
+                    currentGroups = getFromCache('groups') || [];
+                    setGroups(currentGroups);
+                    if (currentGroups.length === 0) {
+                        setError(t('noOfflineData') || 'No offline data available');
+                    }
+                }
+
+                // Decide which group to view
                 if (groupId) {
-                    const group = groupsRes.data.find((g: any) => g._id === groupId);
+                    const group = currentGroups.find((g: any) => g._id === groupId);
                     setSelectedGroup(group || null);
                     if (group) {
                         fetchGroupData(groupId);
                     }
-                } else if (groupsRes.data.length > 0) {
-                    // Default to first group if none selected
-                    const firstGroupId = groupsRes.data[0]._id;
+                } else if (currentGroups.length > 0) {
+                    const firstGroupId = currentGroups[0]._id;
                     router.push(`/${locale}/dashboard/expenses?groupId=${firstGroupId}`);
                 }
             } catch (err: any) {
-                setError(err.response?.data?.message || 'Failed to load data');
+                const cachedGroups = getFromCache('groups');
+                if (cachedGroups) {
+                    setGroups(cachedGroups);
+                    setError(null);
+                } else {
+                    setError(err.response?.data?.message || 'Failed to load data');
+                }
             } finally {
                 setLoading(false);
             }
         };
 
         fetchInitialData();
+
+        // Background sync listener
+        window.addEventListener('online', handleSync);
+        return () => window.removeEventListener('online', handleSync);
     }, [groupId]);
+
+    const handleSync = async () => {
+        const outbox = getOutbox();
+        if (outbox.length === 0) return;
+
+        console.log('Online! Syncing expenses outbox...');
+        for (const action of outbox) {
+            try {
+                if (action.type === 'ADD_EXPENSE' || action.type === 'SETTLE') {
+                    await api.post('/expenses', action.data);
+                }
+                removeFromOutbox(action.id);
+            } catch (err) {
+                console.error('Sync failed for expense action:', action.id, err);
+            }
+        }
+        if (groupId) fetchGroupData(groupId); // Refresh data after sync
+    };
 
     const fetchGroupData = async (id: string) => {
         try {
-            const [expensesRes, summaryRes, groupsRes] = await Promise.all([
-                api.get(`/expenses/group/${id}`),
-                api.get(`/expenses/summary/${id}`),
-                api.get('/groups')
-            ]);
-            setExpenses(expensesRes.data);
-            setSummary(summaryRes.data);
-            setGroups(groupsRes.data);
-            const updatedGroup = groupsRes.data.find((g: any) => g._id === id);
-            if (updatedGroup) setSelectedGroup(updatedGroup);
+            if (isOnline()) {
+                const [expensesRes, summaryRes, groupsRes] = await Promise.all([
+                    api.get(`/expenses/group/${id}`),
+                    api.get(`/expenses/summary/${id}`),
+                    api.get('/groups')
+                ]);
+                setExpenses(expensesRes.data);
+                setSummary(summaryRes.data);
+                setGroups(groupsRes.data);
+
+                saveToCache(`expenses_${id}`, expensesRes.data);
+                saveToCache(`summary_${id}`, summaryRes.data);
+                saveToCache('groups', groupsRes.data);
+
+                const updatedGroup = groupsRes.data.find((g: any) => g._id === id);
+                if (updatedGroup) setSelectedGroup(updatedGroup);
+            } else {
+                const cachedExpenses: Expense[] = getFromCache(`expenses_${id}`) || [];
+                const outbox = getOutbox().filter(item => item.type === 'ADD_EXPENSE' && item.data.group === id);
+
+                const pendingExpenses = outbox.map(item => ({
+                    ...item.data,
+                    _id: item.id,
+                    paidBy: item.data.paidBy || { _id: 'me', name: 'Me' } // Default to 'Me' if not specified
+                }));
+
+                const allExpenses = [...pendingExpenses, ...cachedExpenses];
+                setExpenses(allExpenses);
+
+                // Re-calculate summary locally
+                const localSummary = calculateSettlements(allExpenses as any);
+                setSummary(localSummary);
+            }
         } catch (err: any) {
             console.error('Failed to fetch group data', err);
+            setExpenses(getFromCache(`expenses_${id}`) || []);
+            setSummary(getFromCache(`summary_${id}`) || null);
         }
     };
 
     const onSubmit = async (data: ExpenseFormValues) => {
         if (!selectedGroup) return;
 
-        try {
-            // Updated split logic: split equally among all members AND guests
-            const amount = Number(data.amount);
-            const totalPeople = selectedGroup.members.length + (selectedGroup.guests?.length || 0);
-            const perPerson = amount / totalPeople;
+        const amount = Number(data.amount);
+        const totalPeople = selectedGroup.members.length + (selectedGroup.guests?.length || 0);
+        const perPerson = amount / totalPeople;
 
-            const splitBetween = [
-                ...selectedGroup.members.map(member => ({
-                    user: member._id,
-                    amount: perPerson
-                })),
-                ...(selectedGroup.guests || []).map(guest => ({
-                    guestName: guest.name,
-                    amount: perPerson
-                }))
-            ];
+        const splitBetween = [
+            ...selectedGroup.members.map(member => ({
+                user: member._id,
+                amount: perPerson
+            })),
+            ...(selectedGroup.guests || []).map(guest => ({
+                guestName: guest.name,
+                amount: perPerson
+            }))
+        ];
 
-            await api.post('/expenses', {
-                group: selectedGroup._id,
-                amount,
+        const payload = {
+            group: selectedGroup._id,
+            amount,
+            description: data.description,
+            category: data.category,
+            splitBetween
+        };
+
+        if (isOnline()) {
+            try {
+                await api.post('/expenses', payload);
+                setIsModalOpen(false);
+                reset();
+                fetchGroupData(selectedGroup._id);
+            } catch (err: any) {
+                alert(err.response?.data?.message || 'Failed to add expense');
+            }
+        } else {
+            // Optimistic UI
+            const currentUser = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
+            const optimisticExpense: Expense = {
+                _id: 'temp-' + Date.now(),
                 description: data.description,
+                amount,
                 category: data.category,
-                splitBetween
-            });
+                paidBy: {
+                    _id: currentUser.id || 'me',
+                    name: currentUser.name || 'Me'
+                },
+                date: new Date().toISOString(),
+                createdAt: new Date().toISOString()
+            };
+
+            const updatedExpenses = [optimisticExpense, ...expenses];
+            setExpenses(updatedExpenses);
+            saveToCache(`expenses_${selectedGroup._id}`, updatedExpenses);
+            addToOutbox('ADD_EXPENSE', payload);
+
+            // Re-calculate summary immediately
+            const localSummary = calculateSettlements(updatedExpenses as any);
+            setSummary(localSummary);
 
             setIsModalOpen(false);
             reset();
-            fetchGroupData(selectedGroup._id); // Refresh data
-        } catch (err: any) {
-            alert(err.response?.data?.message || 'Failed to add expense');
+            alert(t('savedOffline') || 'Cost logged offline. Will sync later.');
         }
     };
 
@@ -171,93 +277,69 @@ function ExpensesContent() {
         e.preventDefault();
         if (!selectedGroup || !settlementPayer || !settlementReceiver || !settlementAmount) return;
 
-        try {
-            const amount = Number(settlementAmount);
+        const amount = Number(settlementAmount);
+        const payload: any = {
+            group: selectedGroup._id,
+            amount,
+            description: 'Settlement',
+            category: 'Settlement',
+            type: 'Settlement',
+            splitBetween: []
+        };
 
-            // Determine Payer payload
-            let payerPayload: any = {};
-            if (settlementPayer.startsWith('guest:')) {
-                payerPayload.payerGuestName = settlementPayer.replace('guest:', '');
-            } else {
-                // It's a user, so the API will use the authenticated user... wait.
-                // If I am recording that "Rahim paid Me", I am the logged in user.
-                // The API assumes logged-in user is payer unless payerGuestName is set.
-                // If I select "Rahim" (User) as payer, I can't force the API to set paidBy to Rahim unless I am Rahim.
-                // Limitation: I can only record settlements where *I* paid, or a *Guest* paid.
-                // I cannot record "User A paid User B" if I am User C.
-                // Assuming I am the Receiver (Me). 
-                // If User A paid Me, then User A is the payer. I can't submit as User A.
-                // Current workaround: Only support settlements where Payer is Guest OR Payer is Me.
-                // Or update API to allow setting 'paidBy' if admin?
+        // Handle Payer
+        if (settlementPayer.startsWith('guest:')) {
+            payload.payerGuestName = settlementPayer.replace('guest:', '');
+        }
 
-                // Let's stick to the requested feature: "Who gives how much money to ME".
-                // So Payer is X, Receiver is Me.
-                // If Payer is Guest -> payerGuestName.
-                // If Payer is User X -> I can't record on their behalf securely without admin rights or trust.
-                // Allow it for now? The user likely wants to just log it. 
-                // The updated API allows 'paidBy' to be optional but doesn't explicitly let me override 'paidBy' to another user ID unless I add that to the controller.
-                // Let's check controller: 
-                // const paidBy = payerGuestName ? undefined : userId;
-                // It forces 'paidBy' to be ME if not a guest.
+        // Handle Receiver
+        if (settlementReceiver.startsWith('guest:')) {
+            payload.splitBetween.push({
+                guestName: settlementReceiver.replace('guest:', ''),
+                amount
+            });
+        } else {
+            payload.splitBetween.push({
+                user: settlementReceiver,
+                amount
+            });
+        }
 
-                // If the user selects another REGISTERED member as payer, currently the backend won't support it correctly (it will say *I* paid).
-                // I'll add a quick fix to frontend to warn or just handle guests for now?
-                // The user said "option where i can add that who gives how much money to me".
-                // "Who" could be a guest or another member.
-                // If it's another member, I technically *received* money from them.
-                // If I implement "I received from X", then X is payer, I am receiver.
-                // My backend logic `balances[paidById] += amount`.
-                // If I want to say "Rahim (User) paid me (User)", Rahim needs credit.
-                // I need to update backend to allow setting `paidBy` manually?
-                // Or maybe I just handle Guest settlements for now as that was the main context?
-                // User said "members are shown 1... I have added 2 more members... guests".
-                // So "members" likely refers to guests in their context.
-
-                // Let's proceed with Guest support first.
-                // If they select a Real User as payer, I'll restrict it or handle it later.
+        if (isOnline()) {
+            try {
+                await api.post('/expenses', payload);
+                setIsSettlementModalOpen(false);
+                setSettlementAmount('');
+                setSettlementPayer('');
+                setSettlementReceiver('');
+                fetchGroupData(selectedGroup._id);
+            } catch (err: any) {
+                alert(err.response?.data?.message || 'Failed to record settlement');
             }
-
-            const payload: any = {
-                group: selectedGroup._id,
-                amount,
+        } else {
+            const optimisticSettlement: Expense = {
+                _id: 'temp-' + Date.now(),
                 description: 'Settlement',
+                amount,
                 category: 'Settlement',
-                type: 'Settlement',
-                splitBetween: [] // Receiver goes here
+                paidBy: {
+                    _id: settlementPayer.startsWith('guest:') ? 'guest' : settlementPayer,
+                    name: settlementPayer.replace('guest:', '').split(':')[0] // Just in case
+                },
+                date: new Date().toISOString(),
+                createdAt: new Date().toISOString()
             };
 
-            // Handle Payer
-            if (settlementPayer.startsWith('guest:')) {
-                payload.payerGuestName = settlementPayer.replace('guest:', '');
-            } else {
-                // If selected payer is NOT me, and I can't set paidBy, this is an issue.
-                // But for "Guest paid me", this works.
-                // If "User paid me", I can't log it unless I update backend.
-                // I will add a backend update to allow `paidBy` override if needed in next step if this fails.
-            }
-
-            // Handle Receiver (The one who owes/consumes in split)
-            if (settlementReceiver.startsWith('guest:')) {
-                payload.splitBetween.push({
-                    guestName: settlementReceiver.replace('guest:', ''),
-                    amount
-                });
-            } else {
-                payload.splitBetween.push({
-                    user: settlementReceiver,
-                    amount
-                });
-            }
-
-            await api.post('/expenses', payload);
+            const updatedExpenses = [optimisticSettlement, ...expenses];
+            setExpenses(updatedExpenses);
+            saveToCache(`expenses_${selectedGroup._id}`, updatedExpenses);
+            addToOutbox('SETTLE', payload);
 
             setIsSettlementModalOpen(false);
             setSettlementAmount('');
             setSettlementPayer('');
             setSettlementReceiver('');
-            fetchGroupData(selectedGroup._id);
-        } catch (err: any) {
-            alert(err.response?.data?.message || 'Failed to record settlement');
+            alert(t('settlementOffline') || 'Settlement recorded offline.');
         }
     };
 
@@ -463,6 +545,12 @@ function ExpensesContent() {
                 <div className="space-y-6">
                     <div className="flex items-center justify-between px-2">
                         <h2 className="text-xl md:text-2xl font-black tracking-tighter text-white uppercase">{t('settlements')}</h2>
+                        {!isOnline() && (
+                            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500/60 flex items-center gap-1.5 bg-emerald-500/5 px-3 py-1 rounded-full border border-emerald-500/10">
+                                <WifiOff className="w-3 h-3" />
+                                {locale === 'bn' ? '(অনলাইনে আসলে আপডেট হবে)' : '(Updates online)'}
+                            </span>
+                        )}
                     </div>
                     <div className="glass p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] border-white/5 bg-white/[0.02] space-y-4">
                         {summary && summary.length > 0 ? (
@@ -654,7 +742,6 @@ function ExpensesContent() {
                     </div>
                 </form>
             </Modal>
-
         </div>
     );
 }
@@ -665,7 +752,7 @@ export default function ExpensesPage() {
         <Suspense fallback={
             <div className="h-[60vh] flex flex-col items-center justify-center gap-4 text-zinc-500">
                 <Loader2 className="w-10 h-10 animate-spin text-emerald-500" />
-                <p className="font-bold animate-pulse">{t('initializingVault')}</p>
+                <p className="font-bold animate-pulse">Initializing Vault...</p>
             </div>
         }>
             <ExpensesContent />

@@ -23,7 +23,8 @@
         "email": "Email",
         "password": "Password",
         "name": "Full Name",
-        "rememberMe": "Remember Me"
+        "rememberMe": "Remember Me",
+        "forgotPassword": "Forgot Password?"
     },
     "Sidebar": {
         "overview": "Overview",
@@ -124,7 +125,8 @@
         "owes": "Owes",
         "connectionError": "Connection Error",
         "connectionDesc": "{error}. Please make sure the API server is running on port 8000.",
-        "retry": "Retry Connection"
+        "retry": "Retry Connection",
+        "savedOffline": "Saved offline. Will sync when online."
     },
     "Groups": {
         "title": "My Groups",
@@ -135,6 +137,8 @@
         "joinGroupDesc": "Join a group to get started!",
         "manageCosts": "Manage Costs",
         "searchPlaceholder": "Search groups...",
+        "noOfflineData": "No offline data available",
+        "offlineMode": "Viewing offline data",
         "createGroupModal": {
             "title": "Create New Group",
             "groupName": "Group Name",

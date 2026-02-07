@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from 'framer-motion';
-import { LayoutDashboard, Users, Map, Wallet, Settings, LogOut, Globe } from 'lucide-react';
+import { LayoutDashboard, Users, Map, Wallet, Settings, LogOut, Globe, WifiOff } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, usePathname, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -22,10 +22,10 @@ export const DashboardSidebar = ({ isOpen, onClose }: DashboardSidebarProps) => 
 
     const menuItems = [
         { icon: LayoutDashboard, label: t('overview'), href: `/${locale}/dashboard` },
-        { icon: Users, label: t('myGroups'), href: `/${locale}/dashboard/groups` },
+        { icon: Users, label: t('myGroups'), href: `/${locale}/dashboard/groups`, offline: true },
         { icon: Map, label: t('exploreSpots'), href: `/${locale}/recommend` },
         { icon: Globe, label: t('community'), href: `/${locale}/community` },
-        { icon: Wallet, label: t('expenses'), href: `/${locale}/dashboard/expenses` },
+        { icon: Wallet, label: t('expenses'), href: `/${locale}/dashboard/expenses`, offline: true },
         { icon: Settings, label: t('settings'), href: `/${locale}/dashboard/profile` },
     ];
 
@@ -74,6 +74,11 @@ export const DashboardSidebar = ({ isOpen, onClose }: DashboardSidebarProps) => 
                                 )}
                                 <item.icon className={cn("w-5 h-5 transition-transform group-hover:scale-110", isActive && "text-emerald-500")} />
                                 <span className="font-bold text-sm tracking-wide">{item.label}</span>
+                                {item.offline && (
+                                    <div className="ml-auto opacity-40 group-hover:opacity-100 transition-opacity" title="Offline Ready">
+                                        <WifiOff className="w-3.5 h-3.5" />
+                                    </div>
+                                )}
                             </Link>
                         );
                     })}

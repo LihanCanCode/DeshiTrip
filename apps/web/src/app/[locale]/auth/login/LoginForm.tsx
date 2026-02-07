@@ -51,7 +51,7 @@ export function LoginForm() {
             storage.setItem('token', token);
             storage.setItem('user', JSON.stringify(user));
 
-            router.push(`/${params.locale}/recommend`);
+            router.push(`/${params.locale}/dashboard/groups`);
         } catch (error: unknown) {
             const err = error as { response?: { data?: { message?: string } } };
             setError(err.response?.data?.message || 'Login failed. Please check your credentials.');

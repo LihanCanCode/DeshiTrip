@@ -13,6 +13,7 @@ import api from '@/utils/api';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
+import { isOnline, saveToCache, getFromCache, addToOutbox, getOutbox, removeFromOutbox } from '@/utils/offline';
 
 const groupSchema = z.object({
     name: z.string().min(3, 'Group name must be at least 3 characters'),
@@ -63,11 +64,39 @@ export default function GroupsPage() {
     const fetchGroups = async () => {
         try {
             setLoading(true);
-            const response = await api.get('/groups');
-            setGroups(response.data);
-            setError(null);
+
+            if (isOnline()) {
+                try {
+                    const response = await api.get('/groups');
+                    setGroups(response.data);
+                    saveToCache('groups', response.data);
+                    setError(null);
+                } catch (apiErr) {
+                    const cached = getFromCache('groups');
+                    if (cached) {
+                        setGroups(cached);
+                        setError(t('connectionErrorUsingCache') || 'Connection error. Showing cached data.');
+                    } else {
+                        throw apiErr;
+                    }
+                }
+            } else {
+                const cachedGroups = getFromCache('groups');
+                if (cachedGroups) {
+                    setGroups(cachedGroups);
+                    setError(t('offlineMode') || 'Viewing offline data');
+                } else {
+                    setError(t('noOfflineData') || 'No offline data available');
+                }
+            }
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Failed to fetch groups');
+            const cachedGroups = getFromCache('groups');
+            if (cachedGroups) {
+                setGroups(cachedGroups);
+                setError(t('connectionErrorUsingCache') || 'Connection error. Showing cached data.');
+            } else {
+                setError(err.response?.data?.message || 'Failed to fetch groups');
+            }
         } finally {
             setLoading(false);
         }
@@ -75,7 +104,31 @@ export default function GroupsPage() {
 
     useEffect(() => {
         fetchGroups();
+
+        // Background sync listener
+        window.addEventListener('online', handleSync);
+        return () => window.removeEventListener('online', handleSync);
     }, []);
+
+    const handleSync = async () => {
+        const outbox = getOutbox();
+        if (outbox.length === 0) return;
+
+        console.log('Online! Syncing outbox...');
+        for (const action of outbox) {
+            try {
+                if (action.type === 'CREATE_GROUP') {
+                    await api.post('/groups', action.data);
+                } else if (action.type === 'JOIN_GROUP') {
+                    await api.post('/groups/join', action.data);
+                }
+                removeFromOutbox(action.id);
+            } catch (err) {
+                console.error('Sync failed for action:', action.id, err);
+            }
+        }
+        fetchGroups(); // Refresh list after sync
+    };
 
     const addGuest = () => {
         if (guestInput.trim() && !guests.includes(guestInput.trim())) {
@@ -89,26 +142,59 @@ export default function GroupsPage() {
     };
 
     const onCreateSubmit = async (data: GroupFormValues) => {
-        try {
-            const payload = { ...data, guests };
-            const response = await api.post('/groups', payload);
-            setGroups([response.data, ...groups]);
+        const payload = { ...data, guests };
+        if (isOnline()) {
+            try {
+                const response = await api.post('/groups', payload);
+                setGroups([response.data, ...groups]);
+                saveToCache('groups', [response.data, ...groups]);
+                setIsCreateModalOpen(false);
+                createForm.reset();
+                setGuests([]);
+            } catch (err: any) {
+                alert(err.response?.data?.message || 'Failed to create group');
+            }
+        } else {
+            // Offline: Optimistic UI + Outbox
+            const optimisticGroup: Group = {
+                _id: 'temp-' + Date.now(),
+                name: data.name,
+                description: data.description || '',
+                members: [],
+                guests: guests.map(g => ({ name: g, addedBy: 'me' })),
+                inviteCode: 'OFFLINE',
+                status: 'Planning',
+                role: 'Admin',
+                admin: {}
+            };
+
+            const newGroups = [optimisticGroup, ...groups];
+            setGroups(newGroups);
+            saveToCache('groups', newGroups);
+            addToOutbox('CREATE_GROUP', payload);
+
             setIsCreateModalOpen(false);
             createForm.reset();
-            setGuests([]); // Reset guests
-        } catch (err: any) {
-            alert(err.response?.data?.message || 'Failed to create group');
+            setGuests([]);
+            alert(t('savedOffline') || 'Saved offline. Will sync when online.');
         }
     };
 
     const onJoinSubmit = async (data: JoinFormValues) => {
-        try {
-            await api.post('/groups/join', data);
-            fetchGroups(); // Refresh list to get the new group
+        if (isOnline()) {
+            try {
+                await api.post('/groups/join', data);
+                fetchGroups();
+                setIsJoinModalOpen(false);
+                joinForm.reset();
+            } catch (err: any) {
+                alert(err.response?.data?.message || 'Failed to join group');
+            }
+        } else {
+            addToOutbox('JOIN_GROUP', data);
             setIsJoinModalOpen(false);
             joinForm.reset();
-        } catch (err: any) {
-            alert(err.response?.data?.message || 'Failed to join group');
+            alert(t('joinRequestSaved') || 'Join request saved offline.');
         }
     };
 
