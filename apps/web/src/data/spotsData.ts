@@ -15,6 +15,7 @@ export interface Spot {
     location: { coordinates: [number, number] };
     description?: { en: string; bn: string };
     tourPlan?: TourPlan;
+    isSearchResult?: boolean;
 }
 
 export const spotsData: Spot[] = [

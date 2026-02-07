@@ -5,14 +5,14 @@ import { v4 as uuidv4 } from 'uuid';
 export interface PendingAction {
     id: string;
     type: 'ADD_EXPENSE' | 'CREATE_GROUP' | 'JOIN_GROUP' | 'SETTLE';
-    data: any;
+    data: unknown;
     timestamp: number;
 }
 
 const CACHE_PREFIX = 'deshitrip_cache_';
 const OUTBOX_KEY = 'deshitrip_outbox';
 
-export const saveToCache = (key: string, data: any) => {
+export const saveToCache = (key: string, data: unknown) => {
     if (typeof window === 'undefined') return;
     try {
         localStorage.setItem(CACHE_PREFIX + key, JSON.stringify(data));
@@ -32,7 +32,7 @@ export const getFromCache = (key: string) => {
     }
 };
 
-export const addToOutbox = (type: PendingAction['type'], data: any) => {
+export const addToOutbox = (type: PendingAction['type'], data: unknown) => {
     if (typeof window === 'undefined') return;
     const action: PendingAction = {
         id: uuidv4(),
@@ -51,7 +51,7 @@ export const getOutbox = (): PendingAction[] => {
     try {
         const data = localStorage.getItem(OUTBOX_KEY);
         return data ? JSON.parse(data) : [];
-    } catch (e) {
+    } catch {
         return [];
     }
 };

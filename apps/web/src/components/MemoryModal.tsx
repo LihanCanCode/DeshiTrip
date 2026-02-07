@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/Button";
 import { useState } from "react";
 import { Sparkles, Upload } from "lucide-react";
 import api from "@/utils/api";
-import { motion } from "framer-motion";
 
 interface MemoryModalProps {
     isOpen: boolean;
@@ -76,7 +75,11 @@ export const MemoryModal = ({ isOpen, onClose, groupId, onSuccess }: MemoryModal
 
                     {previewUrl ? (
                         <div className="relative w-full h-full">
-                            <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                            <img
+                                src={previewUrl}
+                                alt="Trip preview"
+                                className="w-full h-full object-cover"
+                            />
                             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                 <p className="text-white font-bold">Click to Change</p>
                             </div>

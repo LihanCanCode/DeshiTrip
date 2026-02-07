@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from 'framer-motion';
-import { User, Mail, Shield, Globe, Camera, Save, Bell, Lock, Info } from 'lucide-react';
+import { User, Globe, Camera, Save, Bell, Lock, Info } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useParams } from 'next/navigation';
@@ -11,7 +11,7 @@ import { useTranslations } from 'next-intl';
 export default function ProfilePage() {
     const t = useTranslations('Settings');
     const params = useParams();
-    const locale = params.locale as string;
+    // const locale = params.locale as string;
     const [isSaving, setIsSaving] = useState(false);
     const [user, setUser] = useState<{ name: string; email: string } | null>(null);
 

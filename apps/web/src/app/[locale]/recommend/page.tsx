@@ -10,8 +10,9 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { useParams } from "next/navigation";
 
-import { spotsData, Spot } from "@/data/spotsData";
+import { spotsData } from "@/data/spotsData";
 import { SpotDetailModal } from "@/components/SpotDetailModal";
+import type { Spot } from "@/data/spotsData";
 
 const curatedSpots = spotsData;
 
@@ -21,10 +22,10 @@ export default function RecommendPage() {
     const locale = (params.locale as string) || 'en';
     const currentLocale = locale as 'en' | 'bn';
 
-    const [selectedSpot, setSelectedSpot] = useState<any>(null);
+    const [selectedSpot, setSelectedSpot] = useState<Spot | null>(null);
     const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
     const [allRoutes, setAllRoutes] = useState<Record<string, any>>({});
-    const [searchResults, setSearchResults] = useState<any[]>([]);
+    const [searchResults, setSearchResults] = useState<Spot[]>([]);
     const [searchRoutes, setSearchRoutes] = useState<Record<string, any>>({});
     const [routeMetrics, setRouteMetrics] = useState<{ distance: string; duration: string } | null>(null);
     const [loadingRoute, setLoadingRoute] = useState(false);
@@ -79,7 +80,7 @@ export default function RecommendPage() {
                 });
 
                 const results = await Promise.all(routePromises);
-                const validRoutes = results.reduce((acc: any, curr) => {
+                const validRoutes = results.reduce((acc: Record<string, any>, curr) => {
                     if (curr) acc[curr.id] = curr.data;
                     return acc;
                 }, {});
@@ -90,7 +91,7 @@ export default function RecommendPage() {
             };
             fetchAllRoutes();
         }
-    }, [userLocation, curatedSpots.length]); // Re-run if location or spots list changes
+    }, [userLocation]); // Re-run if location changes
 
     // Debounced Search with stable place_id keys
     useEffect(() => {
@@ -101,7 +102,7 @@ export default function RecommendPage() {
                     const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery + " Bangladesh")}&limit=5`);
                     const data = await res.json();
 
-                    const formattedResults = data.map((item: any) => ({
+                    const formattedResults = data.map((item: { place_id: string; display_name: string; lon: string; lat: string }) => ({
                         _id: `search-${item.place_id}`,
                         name: { en: item.display_name.split(',')[0], bn: item.display_name.split(',')[0] },
                         location: { coordinates: [parseFloat(item.lon), parseFloat(item.lat)] },
@@ -109,8 +110,8 @@ export default function RecommendPage() {
                     }));
 
                     setSearchResults(formattedResults);
-                } catch (error) {
-                    console.error("Search failed:", error);
+                } catch (err) {
+                    console.error("Search failed:", err);
                 } finally {
                     setIsSearching(false);
                 }
@@ -283,7 +284,7 @@ export default function RecommendPage() {
 
                     <div className="lg:col-span-3 min-h-[400px] md:min-h-[500px] order-1 lg:order-2">
                         <TravelMap
-                            spots={displaySpots as any}
+                            spots={displaySpots}
                             selectedSpot={selectedSpot}
                             userLocation={userLocation}
                             routeData={currentRouteData}

@@ -5,7 +5,7 @@ import { Plus, Users, MapPin, Search, ArrowRight, UserPlus, AlertCircle, X } fro
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -36,12 +36,11 @@ interface Group {
     inviteCode: string;
     status: 'Upcoming' | 'Planning' | 'Completed';
     role: 'Admin' | 'Member';
-    admin: any;
+    admin: unknown;
 }
 export default function GroupsPage() {
     const t = useTranslations('Groups');
     const params = useParams();
-    const router = useRouter();
     const locale = params.locale as string;
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
@@ -61,7 +60,7 @@ export default function GroupsPage() {
         resolver: zodResolver(joinSchema),
     });
 
-    const fetchGroups = async () => {
+    const fetchGroups = useCallback(async () => {
         try {
             setLoading(true);
 
@@ -89,28 +88,22 @@ export default function GroupsPage() {
                     setError(t('noOfflineData') || 'No offline data available');
                 }
             }
-        } catch (err: any) {
+        } catch (err) {
             const cachedGroups = getFromCache('groups');
             if (cachedGroups) {
                 setGroups(cachedGroups);
                 setError(t('connectionErrorUsingCache') || 'Connection error. Showing cached data.');
             } else {
-                setError(err.response?.data?.message || 'Failed to fetch groups');
+                const errorMessage = err instanceof Error ? (err as any).response?.data?.message || err.message : 'Failed to fetch groups';
+                setError(errorMessage);
             }
         } finally {
             setLoading(false);
         }
-    };
+    }, [t]);
 
-    useEffect(() => {
-        fetchGroups();
 
-        // Background sync listener
-        window.addEventListener('online', handleSync);
-        return () => window.removeEventListener('online', handleSync);
-    }, []);
-
-    const handleSync = async () => {
+    const handleSync = useCallback(async () => {
         const outbox = getOutbox();
         if (outbox.length === 0) return;
 
@@ -128,7 +121,15 @@ export default function GroupsPage() {
             }
         }
         fetchGroups(); // Refresh list after sync
-    };
+    }, [fetchGroups]);
+
+    useEffect(() => {
+        fetchGroups();
+
+        // Background sync listener
+        window.addEventListener('online', handleSync);
+        return () => window.removeEventListener('online', handleSync);
+    }, [fetchGroups, handleSync]);
 
     const addGuest = () => {
         if (guestInput.trim() && !guests.includes(guestInput.trim())) {
@@ -151,8 +152,9 @@ export default function GroupsPage() {
                 setIsCreateModalOpen(false);
                 createForm.reset();
                 setGuests([]);
-            } catch (err: any) {
-                alert(err.response?.data?.message || 'Failed to create group');
+            } catch (err) {
+                const errorMessage = err instanceof Error ? (err as any).response?.data?.message || err.message : 'Failed to create group';
+                alert(errorMessage);
             }
         } else {
             // Offline: Optimistic UI + Outbox
@@ -187,8 +189,9 @@ export default function GroupsPage() {
                 fetchGroups();
                 setIsJoinModalOpen(false);
                 joinForm.reset();
-            } catch (err: any) {
-                alert(err.response?.data?.message || 'Failed to join group');
+            } catch (err) {
+                const errorMessage = err instanceof Error ? (err as any).response?.data?.message || err.message : 'Failed to join group';
+                alert(errorMessage);
             }
         } else {
             addToOutbox('JOIN_GROUP', data);

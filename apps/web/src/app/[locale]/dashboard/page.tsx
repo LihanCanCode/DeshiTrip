@@ -1,9 +1,9 @@
 "use client";
 
 import { motion } from 'framer-motion';
-import { Plus, Users, Calendar, MapPin, TrendingUp, AlertCircle, Loader2 } from 'lucide-react';
+import { Plus, Users, Calendar, MapPin, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { cn } from '@/utils/cn';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
@@ -22,13 +22,20 @@ const groupSchema = z.object({
 
 type GroupFormValues = z.infer<typeof groupSchema>;
 
+interface Group {
+    _id: string;
+    name: string;
+    members: any[];
+    guests: any[];
+    inviteCode: string;
+}
+
 export default function DashboardPage() {
     const t = useTranslations('Dashboard');
     const params = useParams();
-    const router = useRouter();
     const locale = params.locale as string;
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [groups, setGroups] = useState<any[]>([]);
+    const [groups, setGroups] = useState<Group[]>([]);
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({
         activeGroups: 0,
@@ -59,7 +66,7 @@ export default function DashboardPage() {
                 ...prev,
                 activeGroups: response.data.length
             }));
-        } catch (err: any) {
+        } catch (err) {
             console.error('Failed to fetch dashboard data', err);
         } finally {
             setLoading(false);
@@ -89,8 +96,9 @@ export default function DashboardPage() {
             reset();
             setGuests([]); // Reset guests
             fetchData(); // Refresh dashboard
-        } catch (err: any) {
-            alert(err.response?.data?.message || 'Failed to create group');
+        } catch (err) {
+            const errorMessage = err instanceof Error ? (err as any).response?.data?.message || err.message : 'Failed to create group';
+            alert(errorMessage);
         }
     };
 
@@ -197,7 +205,11 @@ export default function DashboardPage() {
                             { spot: 'Sundarbans', district: 'Khulna', image: 'https://images.unsplash.com/photo-1623945359620-8049281559ed?w=400&auto=format&fit=crop' },
                         ].map((rec, i) => (
                             <Link href={`/${locale}/recommend`} key={i} className="block group relative overflow-hidden rounded-[2rem] md:rounded-[2.5rem] h-48 md:h-56 cursor-pointer border border-white/5 shadow-2xl">
-                                <img src={rec.image} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale-[30%] group-hover:grayscale-0" />
+                                <img
+                                    src={rec.image}
+                                    alt={rec.spot}
+                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale-[30%] group-hover:grayscale-0"
+                                />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
                                 <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8">
                                     <h4 className="text-lg md:text-xl font-black tracking-tight uppercase">{rec.spot}</h4>
