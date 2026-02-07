@@ -13,4 +13,4 @@ apps/web/.next/
 
 # logs and local data
 *.log
-data/
+/data/
