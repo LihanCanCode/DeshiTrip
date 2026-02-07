@@ -7,6 +7,9 @@ import { useParams, usePathname, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/utils/cn';
 import { Logo } from './Logo';
+import { useOnline } from '@/hooks/useOnline';
+import { useState } from 'react';
+import { Toast } from './ui/Toast';
 
 interface DashboardSidebarProps {
     isOpen?: boolean;
@@ -19,6 +22,8 @@ export const DashboardSidebar = ({ isOpen, onClose }: DashboardSidebarProps) => 
     const router = useRouter();
     const params = useParams();
     const locale = (params.locale as string) || 'en';
+    const isOnline = useOnline();
+    const [showToast, setShowToast] = useState(false);
 
     const menuItems = [
         { icon: LayoutDashboard, label: t('overview'), href: `/${locale}/dashboard` },
@@ -33,6 +38,15 @@ export const DashboardSidebar = ({ isOpen, onClose }: DashboardSidebarProps) => 
         localStorage.clear();
         sessionStorage.clear();
         router.push(`/${params.locale}/auth/login`);
+    };
+
+    const handleLinkClick = (e: React.MouseEvent, item: typeof menuItems[0]) => {
+        if (!isOnline && !item.offline) {
+            e.preventDefault();
+            setShowToast(true);
+        } else if (onClose) {
+            onClose();
+        }
     };
 
     return (
@@ -58,12 +72,13 @@ export const DashboardSidebar = ({ isOpen, onClose }: DashboardSidebarProps) => 
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                onClick={onClose}
+                                onClick={(e) => handleLinkClick(e, item)}
                                 className={cn(
                                     "flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group relative overflow-hidden",
                                     isActive
                                         ? "bg-emerald-600/10 text-emerald-500"
-                                        : "text-zinc-500 hover:text-white hover:bg-white/5"
+                                        : "text-zinc-500 hover:text-white hover:bg-white/5",
+                                    (!isOnline && !item.offline) && "opacity-50 cursor-not-allowed grayscale"
                                 )}
                             >
                                 {isActive && (
@@ -92,6 +107,12 @@ export const DashboardSidebar = ({ isOpen, onClose }: DashboardSidebarProps) => 
                     <span className="font-bold text-sm tracking-wide">{t('logout')}</span>
                 </button>
             </aside>
+
+            <Toast
+                isVisible={showToast}
+                onClose={() => setShowToast(false)}
+                message="This feature requires an internet connection."
+            />
         </>
     );
 };
