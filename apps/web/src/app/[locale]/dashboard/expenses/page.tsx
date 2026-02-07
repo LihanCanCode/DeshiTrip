@@ -84,6 +84,22 @@ function ExpensesContent() {
     useEffect(() => {
         const fetchInitialData = async () => {
             try {
+                // Cache-First: Immediate load from local storage
+                const cachedGroups = getFromCache('groups') || [];
+                if (cachedGroups.length > 0) {
+                    setGroups(cachedGroups);
+                    // If we have a groupId in URL, try to load its specific cache too
+                    if (groupId) {
+                        const cachedExp = getFromCache(`expenses_${groupId}`);
+                        const cachedSum = getFromCache(`summary_${groupId}`);
+                        if (cachedExp) setExpenses(cachedExp);
+                        if (cachedSum) setSummary(cachedSum);
+                        const group = cachedGroups.find((g: any) => g._id === groupId);
+                        if (group) setSelectedGroup(group);
+                    }
+                    setLoading(false);
+                }
+
                 setLoading(true);
                 let currentGroups: Group[] = [];
 

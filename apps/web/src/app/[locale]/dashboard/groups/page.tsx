@@ -104,6 +104,13 @@ export default function GroupsPage() {
 
 
     useEffect(() => {
+        // Cache-First: Load from cache immediately on mount
+        const cachedGroups = getFromCache('groups');
+        if (cachedGroups) {
+            setGroups(cachedGroups);
+            setLoading(false);
+        }
+
         fetchGroups();
 
         // Global sync listener
