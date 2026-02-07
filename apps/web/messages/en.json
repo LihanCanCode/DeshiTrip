@@ -126,7 +126,8 @@
         "connectionError": "Connection Error",
         "connectionDesc": "{error}. Please make sure the API server is running on port 8000.",
         "retry": "Retry Connection",
-        "savedOffline": "Saved offline. Will sync when online."
+        "savedOffline": "Saved offline. Will sync when online.",
+        "settlementOffline": "Settlement recorded offline."
     },
     "Groups": {
         "title": "My Groups",
@@ -156,7 +157,8 @@
             "subtitle": "Enter the 8-character invite code shared by your group admin.",
             "inviteCode": "Invite Code",
             "submit": "Join Journey"
-        }
+        },
+        "joinRequestSaved": "Join request saved offline."
     },
     "Spots": {
         "title": "Find Your Next Spot",
