@@ -1,0 +1,23 @@
+{
+    "name": "DeshiTrip",
+    "short_name": "DeshiTrip",
+    "description": "Modern tourism platform for Bangladesh",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0a0f0d",
+    "theme_color": "#10b981",
+    "icons": [
+        {
+            "src": "/icons/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        }
+    ]
+}

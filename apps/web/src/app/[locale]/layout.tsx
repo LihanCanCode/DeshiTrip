@@ -7,6 +7,16 @@ import { notFound } from 'next/navigation';
 export const metadata: Metadata = {
   title: "DeshiTrip | Explore Bangladesh",
   description: "Your ultimate travel companion for discovering the beauty of Bangladesh.",
+  manifest: "/manifest.json",
+  themeColor: "#10b981",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "DeshiTrip",
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
 
 import { Outfit } from "next/font/google";
