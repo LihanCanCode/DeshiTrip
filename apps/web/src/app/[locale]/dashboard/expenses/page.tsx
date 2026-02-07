@@ -133,28 +133,14 @@ function ExpensesContent() {
 
         fetchInitialData();
 
-        // Background sync listener
-        window.addEventListener('online', handleSync);
-        return () => window.removeEventListener('online', handleSync);
+        // Global sync listener
+        const refreshData = () => {
+            console.log('[Expenses] Global sync complete, refreshing...');
+            if (groupId) fetchGroupData(groupId);
+        };
+        window.addEventListener('app:sync-complete', refreshData);
+        return () => window.removeEventListener('app:sync-complete', refreshData);
     }, [groupId]);
-
-    const handleSync = async () => {
-        const outbox = getOutbox();
-        if (outbox.length === 0) return;
-
-        console.log('Online! Syncing expenses outbox...');
-        for (const action of outbox) {
-            try {
-                if (action.type === 'ADD_EXPENSE' || action.type === 'SETTLE') {
-                    await api.post('/expenses', action.data);
-                }
-                removeFromOutbox(action.id);
-            } catch (err) {
-                console.error('Sync failed for expense action:', action.id, err);
-            }
-        }
-        if (groupId) fetchGroupData(groupId); // Refresh data after sync
-    };
 
     const fetchGroupData = async (id: string) => {
         try {
@@ -176,12 +162,12 @@ function ExpensesContent() {
                 if (updatedGroup) setSelectedGroup(updatedGroup);
             } else {
                 const cachedExpenses: Expense[] = getFromCache(`expenses_${id}`) || [];
-                const outbox = getOutbox().filter(item => item.type === 'ADD_EXPENSE' && item.data.group === id);
+                const outbox = getOutbox().filter(item => item.type === 'ADD_EXPENSE' && (item.data as any).group === id);
 
                 const pendingExpenses = outbox.map(item => ({
-                    ...item.data,
+                    ...(item.data as any),
                     _id: item.id,
-                    paidBy: item.data.paidBy || { _id: 'me', name: 'Me' } // Default to 'Me' if not specified
+                    paidBy: (item.data as any).paidBy || { _id: 'me', name: 'Me' } // Default to 'Me' if not specified
                 }));
 
                 const allExpenses = [...pendingExpenses, ...cachedExpenses];

@@ -103,33 +103,17 @@ export default function GroupsPage() {
     }, [t]);
 
 
-    const handleSync = useCallback(async () => {
-        const outbox = getOutbox();
-        if (outbox.length === 0) return;
-
-        console.log('Online! Syncing outbox...');
-        for (const action of outbox) {
-            try {
-                if (action.type === 'CREATE_GROUP') {
-                    await api.post('/groups', action.data);
-                } else if (action.type === 'JOIN_GROUP') {
-                    await api.post('/groups/join', action.data);
-                }
-                removeFromOutbox(action.id);
-            } catch (err) {
-                console.error('Sync failed for action:', action.id, err);
-            }
-        }
-        fetchGroups(); // Refresh list after sync
-    }, [fetchGroups]);
-
     useEffect(() => {
         fetchGroups();
 
-        // Background sync listener
-        window.addEventListener('online', handleSync);
-        return () => window.removeEventListener('online', handleSync);
-    }, [fetchGroups, handleSync]);
+        // Global sync listener
+        const refreshData = () => {
+            console.log('[Groups] Global sync complete, refreshing...');
+            fetchGroups();
+        };
+        window.addEventListener('app:sync-complete', refreshData);
+        return () => window.removeEventListener('app:sync-complete', refreshData);
+    }, [fetchGroups]);
 
     const addGuest = () => {
         if (guestInput.trim() && !guests.includes(guestInput.trim())) {

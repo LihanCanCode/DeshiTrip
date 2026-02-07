@@ -30,6 +30,8 @@ const outfit = Outfit({
 
 const locales = ['en', 'bn'];
 
+import { SyncManager } from "@/components/SyncManager";
+
 export default async function RootLayout({
   children,
   params: { locale }
@@ -50,6 +52,7 @@ export default async function RootLayout({
         className={`${outfit.variable} antialiased selection:bg-emerald-500 selection:text-white bg-[#0a0f0d]`}
       >
         <NextIntlClientProvider locale={locale} messages={messages}>
+          <SyncManager />
           {children}
         </NextIntlClientProvider>
       </body>
