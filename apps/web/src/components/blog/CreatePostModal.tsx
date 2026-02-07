@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useState } from "react";
 import { Image as ImageIcon, MapPin, Send } from "lucide-react";
-import axios from "axios";
+import api from "@/utils/api";
 
 interface CreatePostModalProps {
     isOpen: boolean;
@@ -23,12 +23,9 @@ export const CreatePostModal = ({ isOpen, onClose, onPostCreated }: CreatePostMo
 
         setIsSubmitting(true);
         try {
-            const token = localStorage.getItem('token');
-            await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/blogs`, {
+            await api.post('/blogs', {
                 content,
                 spotName
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
             });
 
             onPostCreated();
