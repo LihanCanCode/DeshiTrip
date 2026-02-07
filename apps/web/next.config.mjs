@@ -9,9 +9,11 @@ const withPWA = withPWAInit({
     register: true,
     skipWaiting: true,
     fallbacks: {
-        document: "/offline", // Default fallback if content isn't cached
+        document: "/offline.html",
     },
     cacheOnFrontEndNav: true,
+    aggressiveFrontEndNavCaching: true,
+    reloadOnOnline: true,
 });
 
 /** @type {import('next').NextConfig} */

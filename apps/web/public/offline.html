@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeshiTrip | Offline</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; background-color: #0a0f0d; color: white; }
+        .glow { position: absolute; border-radius: 50%; filter: blur(100px); z-index: 0; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6 overflow-hidden">
+    <div class="glow top-0 -left-20 w-96 h-96 bg-emerald-600/10"></div>
+    <div class="glow bottom-0 -right-20 w-96 h-96 bg-emerald-900/10"></div>
+
+    <div class="relative z-10 max-w-lg text-center">
+        <div class="mb-8 relative inline-block">
+            <div class="absolute inset-0 bg-emerald-500/20 blur-2xl rounded-full"></div>
+            <div class="relative bg-zinc-900/50 border border-white/10 p-8 rounded-full shadow-2xl">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-500"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path><path d="M10.71 5.05A16 16 0 0 1 22.58 9"></path><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+            </div>
+        </div>
+
+        <h1 id="title" class="text-4xl md:text-5xl font-black mb-4 tracking-tight">You're Offline</h1>
+        <p id="desc" class="text-zinc-400 text-lg mb-8 leading-relaxed">It seems you've wandered into an area without signal. Don't worry, your adventure continues even without the internet!</p>
+
+        <div class="bg-white/5 border border-white/10 p-6 rounded-3xl mb-12 backdrop-blur-xl">
+            <p id="saved-data" class="text-sm font-medium text-emerald-400 uppercase tracking-widest">Your recent data and expenses are safe.</p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center font-bold">
+            <a href="/en/dashboard/expenses" class="px-8 py-4 bg-emerald-600 rounded-2xl hover:bg-emerald-500 transition-all shadow-[0_0_40px_rgba(16,185,129,0.2)]">Manage Expenses</a>
+            <a href="/en" class="px-8 py-4 border border-zinc-700 rounded-2xl hover:bg-white/5 transition-all text-zinc-300">Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        // Check locale from URL and update text if needed (Basic)
+        if (window.location.pathname.startsWith('/bn')) {
+            document.getElementById('title').innerText = "আপনি অফলাইনে আছেন";
+            document.getElementById('desc').innerText = "মনে হচ্ছে আপনি নেটওয়ার্কের বাইরে চলে এসেছেন। চিন্তা করবেন না, ইন্টারনেট ছাড়াই আপনার অ্যাডভেঞ্চার চলবে!";
+            document.getElementById('saved-data').innerText = "আপনার সাম্প্রতিক ডেটা এবং খরচ সুরক্ষিত আছে।";
+            document.querySelectorAll('a')[0].innerText = "খরচ পরিচালনা করুন";
+            document.querySelectorAll('a')[1].innerText = "হোমে ফিরে যান";
+            document.querySelectorAll('a')[0].href = "/bn/dashboard/expenses";
+            document.querySelectorAll('a')[1].href = "/bn";
+        }
+    </script>
+</body>
+</html>

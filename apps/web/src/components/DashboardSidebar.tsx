@@ -26,7 +26,7 @@ export const DashboardSidebar = ({ isOpen, onClose }: DashboardSidebarProps) => 
     const [showToast, setShowToast] = useState(false);
 
     const menuItems = [
-        { icon: LayoutDashboard, label: t('overview'), href: `/${locale}/dashboard` },
+        { icon: LayoutDashboard, label: t('overview'), href: `/${locale}/dashboard`, offline: true },
         { icon: Users, label: t('myGroups'), href: `/${locale}/dashboard/groups`, offline: true },
         { icon: Map, label: t('exploreSpots'), href: `/${locale}/recommend` },
         { icon: Globe, label: t('community'), href: `/${locale}/community` },
