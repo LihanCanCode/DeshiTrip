@@ -8,6 +8,10 @@ const withPWA = withPWAInit({
     disable: process.env.NODE_ENV === "development",
     register: true,
     skipWaiting: true,
+    fallbacks: {
+        document: "/offline", // Default fallback if content isn't cached
+    },
+    cacheOnFrontEndNav: true,
 });
 
 /** @type {import('next').NextConfig} */

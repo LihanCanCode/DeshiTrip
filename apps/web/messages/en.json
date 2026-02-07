@@ -185,5 +185,12 @@
             "estimatedBudget": "Estimated Budget",
             "budgetDesc": "Includes Transport, Hotel & Food"
         }
+    },
+    "Offline": {
+        "title": "You're Offline",
+        "description": "It seems you've wandered into an area without signal. Don't worry, your adventure continues even without the internet!",
+        "goExpenses": "Manage Expenses Offline",
+        "goHome": "Back to Home",
+        "savedData": "Your recent data and expenses are safe and ready for you to manage."
     }
 }
