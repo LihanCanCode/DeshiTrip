@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { createBlog, getBlogs, likeBlog, commentBlog } from '../controllers/blogController';
 import { authMiddleware } from '../middleware/authMiddleware';
 
-const router = Router();
+const router: Router = Router();
 
 // Public: Read blogs
 router.get('/', getBlogs);
