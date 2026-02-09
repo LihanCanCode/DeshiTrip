@@ -1,10 +1,12 @@
 # 🇧🇩 DesiTrip
 
-<img src="apps/web/public/icons/icon-512x512.png" alt="DesiTrip Icon" width="96" />
+<p align="center">
+	<img src="apps/web/public/icons/icon-512x512.png" alt="DesiTrip Icon" width="120" />
+	<br />
+	<strong>DesiTrip</strong>
+</p>
 
-**DesiTrip** is a bilingual travel companion that keeps tour squads organised, uncovers curated Bangladeshi destinations, and syncs shared expenses with offline resilience.
-
-![DesiTrip Banner](https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=1200&h=400&fit=crop&auto=format)
+DesiTrip is a bilingual travel companion that keeps tour squads organised, uncovers curated Bangladeshi destinations, and syncs shared expenses with offline resilience.
 
 ---
 
