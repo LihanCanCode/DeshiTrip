@@ -31,21 +31,32 @@
         </div>
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center font-bold">
-            <a href="/en/dashboard/expenses" class="px-8 py-4 bg-emerald-600 rounded-2xl hover:bg-emerald-500 transition-all shadow-[0_0_40px_rgba(16,185,129,0.2)]">Manage Expenses</a>
+            <a href="/en/dashboard/expenses" data-offline-expenses-link class="px-8 py-4 bg-emerald-600 rounded-2xl hover:bg-emerald-500 transition-all shadow-[0_0_40px_rgba(16,185,129,0.2)]">Manage Expenses</a>
             <a href="/en" class="px-8 py-4 border border-zinc-700 rounded-2xl hover:bg-white/5 transition-all text-zinc-300">Back to Home</a>
         </div>
     </div>
 
     <script>
         // Check locale from URL and update text if needed (Basic)
+        const expensesLink = document.querySelector('[data-offline-expenses-link]');
+        const lastExpensesPath = localStorage.getItem('deshitrip_lastExpensesPath');
+        if (expensesLink && lastExpensesPath) {
+            expensesLink.setAttribute('href', lastExpensesPath);
+        }
+
         if (window.location.pathname.startsWith('/bn')) {
             document.getElementById('title').innerText = "আপনি অফলাইনে আছেন";
             document.getElementById('desc').innerText = "মনে হচ্ছে আপনি নেটওয়ার্কের বাইরে চলে এসেছেন। চিন্তা করবেন না, ইন্টারনেট ছাড়াই আপনার অ্যাডভেঞ্চার চলবে!";
             document.getElementById('saved-data').innerText = "আপনার সাম্প্রতিক ডেটা এবং খরচ সুরক্ষিত আছে।";
-            document.querySelectorAll('a')[0].innerText = "খরচ পরিচালনা করুন";
-            document.querySelectorAll('a')[1].innerText = "হোমে ফিরে যান";
-            document.querySelectorAll('a')[0].href = "/bn/dashboard/expenses";
-            document.querySelectorAll('a')[1].href = "/bn";
+            if (expensesLink) {
+                expensesLink.innerText = "খরচ পরিচালনা করুন";
+                expensesLink.href = lastExpensesPath || "/bn/dashboard/expenses";
+            }
+            const homeLink = document.querySelectorAll('a')[1];
+            if (homeLink) {
+                homeLink.innerText = "হোমে ফিরে যান";
+                homeLink.href = "/bn";
+            }
         }
     </script>
 </body>

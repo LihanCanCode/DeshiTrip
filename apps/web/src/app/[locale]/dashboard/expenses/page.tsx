@@ -158,6 +158,16 @@ function ExpensesContent() {
         return () => window.removeEventListener('app:sync-complete', refreshData);
     }, [groupId]);
 
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const path = `/${locale}/dashboard/expenses${groupId ? `?groupId=${groupId}` : ''}`;
+        try {
+            localStorage.setItem('deshitrip_lastExpensesPath', path);
+        } catch (err) {
+            console.warn('Unable to persist last expenses path', err);
+        }
+    }, [groupId, locale]);
+
     const fetchGroupData = async (id: string) => {
         try {
             if (isOnline()) {
