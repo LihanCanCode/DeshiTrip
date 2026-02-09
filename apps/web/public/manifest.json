@@ -2,7 +2,7 @@
     "name": "DeshiTrip",
     "short_name": "DeshiTrip",
     "description": "Modern tourism platform for Bangladesh",
-    "start_url": "/",
+    "start_url": "/en",
     "display": "standalone",
     "background_color": "#0a0f0d",
     "theme_color": "#10b981",
