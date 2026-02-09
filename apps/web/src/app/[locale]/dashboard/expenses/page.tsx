@@ -168,6 +168,22 @@ function ExpensesContent() {
         }
     }, [groupId, locale]);
 
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        if (!isOnline()) return;
+        const controller = new AbortController();
+        const currentPath = `${window.location.pathname}${window.location.search}`;
+        fetch(currentPath, {
+            headers: {
+                Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8'
+            },
+            signal: controller.signal
+        }).catch(() => {
+            // ignore warmup failures
+        });
+        return () => controller.abort();
+    }, [groupId]);
+
     const fetchGroupData = async (id: string) => {
         try {
             if (isOnline()) {

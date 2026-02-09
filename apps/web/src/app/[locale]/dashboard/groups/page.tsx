@@ -42,6 +42,7 @@ export default function GroupsPage() {
     const t = useTranslations('Groups');
     const params = useParams();
     const locale = params.locale as string;
+    const router = useRouter();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
     const [groups, setGroups] = useState<Group[]>([]);
@@ -121,6 +122,34 @@ export default function GroupsPage() {
         window.addEventListener('app:sync-complete', refreshData);
         return () => window.removeEventListener('app:sync-complete', refreshData);
     }, [fetchGroups]);
+
+    useEffect(() => {
+        if (groups.length === 0) return;
+        const firstGroupId = groups[0]._id;
+        const path = `/${locale}/dashboard/expenses?groupId=${firstGroupId}`;
+
+        try {
+            localStorage.setItem('deshitrip_lastExpensesPath', path);
+        } catch (err) {
+            console.warn('Unable to persist prefetch path', err);
+        }
+
+        if (!isOnline()) return;
+
+        router.prefetch(path);
+
+        const controller = new AbortController();
+        fetch(path, {
+            headers: {
+                Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8'
+            },
+            signal: controller.signal
+        }).catch(() => {
+            // ignore warmup failures
+        });
+
+        return () => controller.abort();
+    }, [groups, locale, router]);
 
     const addGuest = () => {
         if (guestInput.trim() && !guests.includes(guestInput.trim())) {
