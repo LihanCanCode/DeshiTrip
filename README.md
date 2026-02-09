@@ -1,6 +1,8 @@
 # 🇧🇩 DesiTrip
 
-**DesiTrip** is a modern, full-stack tourism platform designed specifically for exploring the beauty of Bangladesh. It empowers travelers to plan tours, discover hidden gems, manage group expenses, and experience seamless travel coordination.
+<img src="apps/web/public/icons/icon-512x512.png" alt="DesiTrip Icon" width="96" />
+
+**DesiTrip** is a bilingual travel companion that keeps tour squads organised, uncovers curated Bangladeshi destinations, and syncs shared expenses with offline resilience.
 
 ![DesiTrip Banner](https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=1200&h=400&fit=crop&auto=format)
 
@@ -8,12 +10,12 @@
 
 ## 🚀 Features
 
--   **Squad Management**: Create travel groups, invite friends via code, and manage members.
--   **Smart Settlements**: sophisticated expense tracking with "Who Paid/Who Split" logic. Support for guest members (non-app users).
--   **Interactive Dashboard**: Real-time stats, active tour tracking, and quick access to tools.
--   **Recommendation Engine**: curated list of top tourist spots in Bangladesh (e.g., Ratargul, Sundarbans).
--   **Authentication**: Secure user accounts with JWT-based sessions.
--   **Internationalization**: Full support for English (`en`) and Bengali (`bn`).
+-   **Squad Management**: Create and name travel crews, generate invite codes, and keep tabs on who has joined—online or offline.
+-   **Smart Settlements**: Log who paid, auto-split amounts across members and guests, and stage settlements for later sync when you reconnect.
+-   **Offline-Ready Dashboard**: Recent groups, expenses, and summaries stay cached on device so dashboards, totals, and quick actions remain usable without coverage.
+-   **Recommendation Engine**: Curated spotlight cards and budgeting insights for popular Bangladeshi destinations, paired with map overviews and tour plans.
+-   **Secure Accounts**: Email-based authentication with JWT sessions, Argon2 hashing, and middleware guards across protected routes.
+-   **Internationalization**: Seamlessly toggles between English (`en`) and Bengali (`bn`) copy, including the offline shell and PWA prompts.
 
 ## 🛠️ Tech Stack
 
@@ -23,15 +25,16 @@ Built using **TurboRepo** and **PNPM** workspaces for efficient scaling.
 ### Frontend (`apps/web`)
 -   **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
 -   **Language**: TypeScript
--   **Styling**: TailwindCSS + Framer Motion (for animations)
+-   **Styling**: Tailwind CSS, Framer Motion
 -   **State/Data**: React Query, React Hook Form, Zod
 -   **Maps**: Mapbox GL / React Map GL
 -   **I18n**: next-intl
+-   **PWA**: next-pwa with Workbox for caching and offline fallbacks
 
 ### Backend (`apps/api`)
 -   **Runtime**: Node.js & Express.js
 -   **Database**: MongoDB (Mongoose ODM)
--   **Auth**: JWT (JSON Web Tokens) & Argon2 hashing
+-   **Auth**: JWT & Argon2 hashing
 -   **API Security**: Helmet, CORS
 -   **Documentation**: Swagger/OpenAPI (prepared)
 
