@@ -8,16 +8,29 @@
 
 DesiTrip is a bilingual travel companion that keeps tour squads organised, uncovers curated Bangladeshi destinations, and syncs shared expenses with offline resilience.
 
+**[Live Demo: deshi-trip.vercel.app](https://deshi-trip.vercel.app)**
+
 ---
 
 ## 🚀 Features
 
--   **Squad Management**: Create and name travel crews, generate invite codes, and keep tabs on who has joined—online or offline.
--   **Smart Settlements**: Log who paid, auto-split amounts across members and guests, and stage settlements for later sync when you reconnect.
--   **Offline-Ready Dashboard**: Recent groups, expenses, and summaries stay cached on device so dashboards, totals, and quick actions remain usable without coverage.
--   **Recommendation Engine**: Curated spotlight cards and budgeting insights for popular Bangladeshi destinations, paired with map overviews and tour plans.
--   **Secure Accounts**: Email-based authentication with JWT sessions, Argon2 hashing, and middleware guards across protected routes.
--   **Internationalization**: Seamlessly toggles between English (`en`) and Bengali (`bn`) copy, including the offline shell and PWA prompts.
+### 🤖 AI-Powered Trip Intelligence
+- **Dynamic Itinerary Generator**: Custom, budget-optimized travel plans across 64 districts of Bangladesh, powered by Google Gemini.
+- **Contextual Recommendation Engine**: Curated spotlight cards for gems like Sajek, Sylhet, and Sundarbans, featuring regional food guides and "hidden spot" alerts.
+- **Smart Budgeting**: Tailored insights for domestic travel, including local transport (bus/launch/train) cost estimations.
+
+### 👥 Squad & Expense Management
+- **Squad Hub**: Create travel crews with unique invite codes. Manage members and "phantom guests" (for non-app users) with ease.
+- **Fractional Settlements**: Log expenses in BDT, auto-split costs, and track "who owes whom" with a staged settlement system.
+- **Seamless Sync**: Log expenses on a remote trail in the Hill Tracts; the app auto-syncs your data the moment you hit a 4G/Wi-Fi zone.
+
+### 📶 Built for the Trail (Offline-First)
+- **Resilient Dashboard**: Your recent groups, expense summaries, and summaries are cached on-device for 100% usability without cellular coverage.
+- **Offline Actions**: Queue new expenses and view itineraries even in deep-forest or high-altitude zones.
+
+### 🔒 Security & Localization
+- **Enterprise-Grade Auth**: Secure login via JWT, Argon2 password hashing, and protected API middleware.
+- **Native Experience**: Full localization support for English (en) and Bengali (bn). The AI planner intelligently responds in your preferred language.
 
 ## 🛠️ Tech Stack
 
@@ -35,6 +48,7 @@ Built using **TurboRepo** and **PNPM** workspaces for efficient scaling.
 
 ### Backend (`apps/api`)
 -   **Runtime**: Node.js & Express.js
+-   **AI Engine**: [Google Gemini Pro](https://ai.google.dev/)
 -   **Database**: MongoDB (Mongoose ODM)
 -   **Auth**: JWT & Argon2 hashing
 -   **API Security**: Helmet, CORS
@@ -68,6 +82,7 @@ Create a `.env` file in `apps/api` and `apps/web` based on the examples.
 PORT=8000
 MONGODB_URI=mongodb://localhost:27017/deshitrip
 JWT_SECRET=your_super_secret_key
+GEMINI_API_KEY=your_gemini_api_key_here
 client_url=http://localhost:3000
 ```
 
