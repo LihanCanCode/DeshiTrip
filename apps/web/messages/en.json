@@ -31,6 +31,7 @@
         "myGroups": "My Groups",
         "exploreSpots": "Explore Spots",
         "community": "Community",
+        "aiPlanner": "AI Trip Planner",
         "expenses": "Expenses",
         "settings": "Settings",
         "logout": "Logout"
@@ -192,5 +193,30 @@
         "goExpenses": "Manage Expenses Offline",
         "goHome": "Back to Home",
         "savedData": "Your recent data and expenses are safe and ready for you to manage."
+    },
+    "Community": {
+        "title": "Community Stories",
+        "description": "Read experiences from fellow travelers or share your own.",
+        "filterPlaceholder": "Filter by spot (e.g. Sajek)...",
+        "shareJourney": "Share Journey",
+        "noStories": "No stories found regarding \"{spot}\".",
+        "beFirst": "Be the first to write about it!"
+    },
+    "AIPlanner": {
+        "title": "AI Trip Planner",
+        "subtitle": "Let AI create your perfect Bangladesh tour",
+        "from": "From",
+        "to": "To (Destination)",
+        "days": "Number of Days",
+        "people": "Number of People",
+        "generate": "Generate Trip Plan",
+        "generating": "Generating Your Perfect Trip...",
+        "budgetBreakdown": "Budget Breakdown",
+        "itinerary": "Day-by-Day Itinerary",
+        "meals": "Meals",
+        "accommodation": "Accommodation",
+        "mustTryFood": "Must Try Food",
+        "essentialTips": "Essential Tips",
+        "packingList": "Packing List"
     }
 }

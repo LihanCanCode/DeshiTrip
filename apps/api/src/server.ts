@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import path from 'path';
 import mongoose from 'mongoose';
 import authRoutes from './routes/authRoutes';
 import groupRoutes from './routes/groupRoutes';
@@ -10,8 +11,10 @@ import spotRoutes from './routes/spotRoutes';
 import expenseRoutes from './routes/expenseRoutes';
 import blogRoutes from './routes/blogRoutes';
 import uploadRoutes from './routes/uploadRoutes';
+import aiPlannerRoutes from './routes/aiPlannerRoutes';
 
-dotenv.config();
+// Load .env file from the api directory
+dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const app: Application = express();
 const port = process.env.PORT || 8000;
@@ -29,6 +32,7 @@ app.use('/api/spots', spotRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/blogs', blogRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/ai-planner', aiPlannerRoutes);
 
 app.get('/health', (req: Request, res: Response) => {
     res.status(200).json({ status: 'OK', message: 'DeshiTrip API is running', db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected' });

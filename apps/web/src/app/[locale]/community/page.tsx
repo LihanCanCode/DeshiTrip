@@ -5,6 +5,7 @@ import axios from "axios";
 import { Search, PenLine, Filter } from "lucide-react";
 import DashboardLayout from "../dashboard/layout";
 import { Button } from "@/components/ui/Button";
+import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/Input";
 import { BlogCard } from "@/components/blog/BlogCard";
 import { CreatePostModal } from "@/components/blog/CreatePostModal";
@@ -15,6 +16,7 @@ export default function CommunityPage() {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [currentUserId, setCurrentUserId] = useState<string | undefined>(undefined);
+    const t = useTranslations('Community');
 
     const fetchBlogs = async () => {
         setIsLoading(true);
@@ -71,15 +73,15 @@ export default function CommunityPage() {
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row justify-between items-end gap-4">
                     <div>
-                        <h1 className="text-4xl font-black mb-2">Community Stories</h1>
-                        <p className="text-zinc-400">Read experiences from fellow travelers or share your own.</p>
+                        <h1 className="text-4xl font-black mb-2">{t('title')}</h1>
+                        <p className="text-zinc-400">{t('description')}</p>
                     </div>
 
                     <div className="flex items-center gap-3 w-full md:w-auto">
                         <div className="relative flex-1 md:w-64">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                             <Input
-                                placeholder="Filter by spot (e.g. Sajek)..."
+                                placeholder={t('filterPlaceholder')}
                                 className="pl-10 h-12 bg-zinc-900/50 border-emerald-500/20 focus:border-emerald-500"
                                 value={filterSpot}
                                 onChange={(e) => setFilterSpot(e.target.value)}
@@ -90,7 +92,7 @@ export default function CommunityPage() {
                             className="bg-emerald-500 hover:bg-emerald-600 text-black font-bold h-12 px-6 rounded-xl whitespace-nowrap"
                         >
                             <PenLine className="w-4 h-4 mr-2" />
-                            Share Journey
+                            {t('shareJourney')}
                         </Button>
                     </div>
                 </div>
@@ -114,8 +116,8 @@ export default function CommunityPage() {
                     ) : (
                         <div className="text-center py-20 text-zinc-500">
                             <Filter className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                            <p className="text-lg">No stories found regarding &quot;{filterSpot}&quot;.</p>
-                            <p className="text-sm">Be the first to write about it!</p>
+                            <p className="text-lg">{t('noStories', { spot: filterSpot })}</p>
+                            <p className="text-sm">{t('beFirst')}</p>
                         </div>
                     )}
                 </div>

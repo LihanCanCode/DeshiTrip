@@ -3,6 +3,7 @@
 import { motion, LazyMotion, domAnimation } from 'framer-motion';
 import { Plane, MapPin, Users, Wallet } from 'lucide-react';
 import { Logo } from '@/components/Logo';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import Link from 'next/link';
 
 import { useTranslations } from 'next-intl';
@@ -18,8 +19,7 @@ export function HomeNav({ locale }: { locale: string }) {
                 <Logo />
             </motion.div>
             <div className="flex gap-8 items-center">
-                <Link href="/en" className="hover:text-emerald-400 transition-colors font-bold">EN</Link>
-                <Link href="/bn" className="hover:text-emerald-400 transition-colors font-bold">বাংলা</Link>
+                <LanguageSwitcher />
                 <Link
                     href={`/${locale}/recommend`}
                     className="bg-emerald-600 hover:bg-emerald-500 px-6 py-2 rounded-full font-bold transition-all transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(16,185,129,0.3)] inline-block text-white"

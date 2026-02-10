@@ -1,1 +1,114 @@
-if(!self.define){let e,s={};const a=(a,n)=>(a=new URL(a+".js",n).href,s[a]||new Promise(s=>{if("document"in self){const e=document.createElement("script");e.src=a,e.onload=s,document.head.appendChild(e)}else e=a,importScripts(a),s()}).then(()=>{let e=s[a];if(!e)throw new Error(`Module ${a} didn’t register its module`);return e}));self.define=(n,t)=>{const i=e||("document"in self?document.currentScript.src:"")||location.href;if(s[i])return;let c={};const r=e=>a(e,i),l={module:{uri:i},exports:c,require:r};s[i]=Promise.all(n.map(e=>l[e]||r(e))).then(e=>(t(...e),c))}}define(["./workbox-5194662c"],function(e){"use strict";importScripts("/fallback-ce627215c0e4a9af.js"),self.skipWaiting(),e.clientsClaim(),e.precacheAndRoute([{url:"/_next/static/chunks/137-6808a51075cd479f.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/213-4225e0805c53007a.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/419-3b24673c0c86fcd1.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/466-5d06d3b55ba71932.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/512-9df67b3aecfee3fb.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/541-84a941e29f08c10f.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/552-31a5d64887b67d99.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/604-925ba4845e033581.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/654-9c0d09b745e2dfba.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/730-01275fbc23d39a78.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/824.8cf5af43298a27f9.js",revision:"8cf5af43298a27f9"},{url:"/_next/static/chunks/826-c9e0c3eb75019a0f.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/932-080ccd1d415c11c5.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/app/%5Blocale%5D/auth/login/page-c01a5ec47792d62f.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/app/%5Blocale%5D/auth/register/page-a3f4a04f08d90704.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/app/%5Blocale%5D/community/page-546249f0e32d2d79.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/app/%5Blocale%5D/dashboard/expenses/page-5fca5083a3c1ab67.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/app/%5Blocale%5D/dashboard/groups/page-671c5932282023a5.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/app/%5Blocale%5D/dashboard/layout-7c1a7ce9f38ca1eb.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/app/%5Blocale%5D/dashboard/page-f7e7e6de71395b70.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/app/%5Blocale%5D/dashboard/profile/page-7aceb5979ba822bf.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/app/%5Blocale%5D/layout-2deee8c5b395e69e.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/app/%5Blocale%5D/not-found-43f8b8571d2b5548.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/app/%5Blocale%5D/offline/page-5aafa94f7a8387ab.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/app/%5Blocale%5D/page-fc489d08d3a7ea8a.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/app/%5Blocale%5D/recommend/page-1bb2844216c3511b.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/app/%5Blocale%5D/test/page-20b840bbdf9773a5.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/app/_not-found/page-8467e71e12ad0ebb.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/ba96a577-01eef4955c424bc9.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/fe69a73d.665070eabf7fb5a8.js",revision:"665070eabf7fb5a8"},{url:"/_next/static/chunks/framework-bef83a85c94ff7de.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/main-23d75568d2fdcf22.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/main-app-a2b3fbd96ffca1de.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/pages/_app-4e713de2da760a88.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/pages/_error-f52b84ad06c99346.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/chunks/polyfills-42372ed130431b0a.js",revision:"846118c33b2c0e922d7b3a7676f81f6f"},{url:"/_next/static/chunks/webpack-b15d1e7e35750907.js",revision:"lGIS_EmTP6CsdztH-aTfZ"},{url:"/_next/static/css/29f397fc81f4af41.css",revision:"29f397fc81f4af41"},{url:"/_next/static/css/857aa62baa17c894.css",revision:"857aa62baa17c894"},{url:"/_next/static/lGIS_EmTP6CsdztH-aTfZ/_buildManifest.js",revision:"2dc756c53cae8af272a71a057f8bdfd9"},{url:"/_next/static/lGIS_EmTP6CsdztH-aTfZ/_ssgManifest.js",revision:"b6652df95db52feb4daf4eca35380933"},{url:"/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2",revision:"98ccc2b7f18991a5126a91ac56fbb1fc"},{url:"/_next/static/media/98848575513c9742-s.woff2",revision:"e2b64ddcb351dbe7397e0da426a8c8d6"},{url:"/_next/static/media/layers-2x.9859cd12.png",revision:"9859cd12"},{url:"/_next/static/media/layers.ef6db872.png",revision:"ef6db872"},{url:"/_next/static/media/marker-icon.d577052a.png",revision:"d577052a"},{url:"/fallback-ce627215c0e4a9af.js",revision:"37ebf96a28893c7abec90433940be7a1"},{url:"/icons/icon-192x192.png",revision:"ac4ba81837cc8db72eafbe99b68062ca"},{url:"/icons/icon-512x512.png",revision:"ba78d4a61b403c2145a432a93c08ea4e"},{url:"/manifest.json",revision:"0127c4132ba771fdc88e2b0c6f5c3006"},{url:"/offline.html",revision:"ac1d124b401dc538e7ab2f771d4c4d11"},{url:"/swe-worker-5c72df51bb1f6ee0.js",revision:"5a47d90db13bb1309b25bdf7b363570e"}],{ignoreURLParametersMatching:[/^utm_/,/^fbclid$/]}),e.cleanupOutdatedCaches(),e.registerRoute("/",new e.NetworkFirst({cacheName:"start-url",plugins:[{cacheWillUpdate:async({response:e})=>e&&"opaqueredirect"===e.type?new Response(e.body,{status:200,statusText:"OK",headers:e.headers}):e},{handlerDidError:async({request:e})=>"undefined"!=typeof self?self.fallback(e):Response.error()}]}),"GET"),e.registerRoute(/^https:\/\/fonts\.(?:gstatic)\.com\/.*/i,new e.CacheFirst({cacheName:"google-fonts-webfonts",plugins:[new e.ExpirationPlugin({maxEntries:4,maxAgeSeconds:31536e3}),{handlerDidError:async({request:e})=>"undefined"!=typeof self?self.fallback(e):Response.error()}]}),"GET"),e.registerRoute(/^https:\/\/fonts\.(?:googleapis)\.com\/.*/i,new e.StaleWhileRevalidate({cacheName:"google-fonts-stylesheets",plugins:[new e.ExpirationPlugin({maxEntries:4,maxAgeSeconds:604800}),{handlerDidError:async({request:e})=>"undefined"!=typeof self?self.fallback(e):Response.error()}]}),"GET"),e.registerRoute(/\.(?:eot|otf|ttc|ttf|woff|woff2|font.css)$/i,new e.StaleWhileRevalidate({cacheName:"static-font-assets",plugins:[new e.ExpirationPlugin({maxEntries:4,maxAgeSeconds:604800}),{handlerDidError:async({request:e})=>"undefined"!=typeof self?self.fallback(e):Response.error()}]}),"GET"),e.registerRoute(/\.(?:jpg|jpeg|gif|png|svg|ico|webp)$/i,new e.StaleWhileRevalidate({cacheName:"static-image-assets",plugins:[new e.ExpirationPlugin({maxEntries:64,maxAgeSeconds:2592e3}),{handlerDidError:async({request:e})=>"undefined"!=typeof self?self.fallback(e):Response.error()}]}),"GET"),e.registerRoute(/\/_next\/static.+\.js$/i,new e.CacheFirst({cacheName:"next-static-js-assets",plugins:[new e.ExpirationPlugin({maxEntries:64,maxAgeSeconds:86400}),{handlerDidError:async({request:e})=>"undefined"!=typeof self?self.fallback(e):Response.error()}]}),"GET"),e.registerRoute(/\/_next\/image\?url=.+$/i,new e.StaleWhileRevalidate({cacheName:"next-image",plugins:[new e.ExpirationPlugin({maxEntries:64,maxAgeSeconds:86400}),{handlerDidError:async({request:e})=>"undefined"!=typeof self?self.fallback(e):Response.error()}]}),"GET"),e.registerRoute(/\.(?:mp3|wav|ogg)$/i,new e.CacheFirst({cacheName:"static-audio-assets",plugins:[new e.RangeRequestsPlugin,new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400}),{handlerDidError:async({request:e})=>"undefined"!=typeof self?self.fallback(e):Response.error()}]}),"GET"),e.registerRoute(/\.(?:mp4|webm)$/i,new e.CacheFirst({cacheName:"static-video-assets",plugins:[new e.RangeRequestsPlugin,new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400}),{handlerDidError:async({request:e})=>"undefined"!=typeof self?self.fallback(e):Response.error()}]}),"GET"),e.registerRoute(/\.(?:js)$/i,new e.StaleWhileRevalidate({cacheName:"static-js-assets",plugins:[new e.ExpirationPlugin({maxEntries:48,maxAgeSeconds:86400}),{handlerDidError:async({request:e})=>"undefined"!=typeof self?self.fallback(e):Response.error()}]}),"GET"),e.registerRoute(/\.(?:css|less)$/i,new e.StaleWhileRevalidate({cacheName:"static-style-assets",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400}),{handlerDidError:async({request:e})=>"undefined"!=typeof self?self.fallback(e):Response.error()}]}),"GET"),e.registerRoute(/\/_next\/data\/.+\/.+\.json$/i,new e.StaleWhileRevalidate({cacheName:"next-data",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400}),{handlerDidError:async({request:e})=>"undefined"!=typeof self?self.fallback(e):Response.error()}]}),"GET"),e.registerRoute(/\.(?:json|xml|csv)$/i,new e.NetworkFirst({cacheName:"static-data-assets",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400}),{handlerDidError:async({request:e})=>"undefined"!=typeof self?self.fallback(e):Response.error()}]}),"GET"),e.registerRoute(({sameOrigin:e,url:{pathname:s}})=>!(!e||s.startsWith("/api/auth/callback")||!s.startsWith("/api/")),new e.NetworkFirst({cacheName:"apis",networkTimeoutSeconds:10,plugins:[new e.ExpirationPlugin({maxEntries:16,maxAgeSeconds:86400}),{handlerDidError:async({request:e})=>"undefined"!=typeof self?self.fallback(e):Response.error()}]}),"GET"),e.registerRoute(({request:e,url:{pathname:s},sameOrigin:a})=>"1"===e.headers.get("RSC")&&"1"===e.headers.get("Next-Router-Prefetch")&&a&&!s.startsWith("/api/"),new e.NetworkFirst({cacheName:"pages-rsc-prefetch",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400}),{handlerDidError:async({request:e})=>"undefined"!=typeof self?self.fallback(e):Response.error()}]}),"GET"),e.registerRoute(({request:e,url:{pathname:s},sameOrigin:a})=>"1"===e.headers.get("RSC")&&a&&!s.startsWith("/api/"),new e.NetworkFirst({cacheName:"pages-rsc",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400}),{handlerDidError:async({request:e})=>"undefined"!=typeof self?self.fallback(e):Response.error()}]}),"GET"),e.registerRoute(({url:{pathname:e},sameOrigin:s})=>s&&!e.startsWith("/api/"),new e.NetworkFirst({cacheName:"pages",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400}),{handlerDidError:async({request:e})=>"undefined"!=typeof self?self.fallback(e):Response.error()}]}),"GET"),e.registerRoute(({sameOrigin:e})=>!e,new e.NetworkFirst({cacheName:"cross-origin",networkTimeoutSeconds:10,plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:3600}),{handlerDidError:async({request:e})=>"undefined"!=typeof self?self.fallback(e):Response.error()}]}),"GET")});
+/**
+ * Copyright 2018 Google Inc. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// If the loader is already loaded, just stop.
+if (!self.define) {
+  let registry = {};
+
+  // Used for `eval` and `importScripts` where we can't get script URL by other means.
+  // In both cases, it's safe to use a global var because those functions are synchronous.
+  let nextDefineUri;
+
+  const singleRequire = (uri, parentUri) => {
+    uri = new URL(uri + ".js", parentUri).href;
+    return registry[uri] || (
+      
+        new Promise(resolve => {
+          if ("document" in self) {
+            const script = document.createElement("script");
+            script.src = uri;
+            script.onload = resolve;
+            document.head.appendChild(script);
+          } else {
+            nextDefineUri = uri;
+            importScripts(uri);
+            resolve();
+          }
+        })
+      
+      .then(() => {
+        let promise = registry[uri];
+        if (!promise) {
+          throw new Error(`Module ${uri} didn’t register its module`);
+        }
+        return promise;
+      })
+    );
+  };
+
+  self.define = (depsNames, factory) => {
+    const uri = nextDefineUri || ("document" in self ? document.currentScript.src : "") || location.href;
+    if (registry[uri]) {
+      // Module is already loading or loaded.
+      return;
+    }
+    let exports = {};
+    const require = depUri => singleRequire(depUri, uri);
+    const specialDeps = {
+      module: { uri },
+      exports,
+      require
+    };
+    registry[uri] = Promise.all(depsNames.map(
+      depName => specialDeps[depName] || require(depName)
+    )).then(deps => {
+      factory(...deps);
+      return exports;
+    });
+  };
+}
+define(['./workbox-95a395ad'], (function (workbox) { 'use strict';
+
+  importScripts("/fallback-development.js");
+  self.skipWaiting();
+  workbox.clientsClaim();
+
+  /**
+   * The precacheAndRoute() method efficiently caches and responds to
+   * requests for URLs in the manifest.
+   * See https://goo.gl/S9QRab
+   */
+  workbox.precacheAndRoute([{
+    "url": "/offline.html",
+    "revision": "development"
+  }], {
+    "ignoreURLParametersMatching": [/^utm_/, /^fbclid$/, /ts/]
+  });
+  workbox.cleanupOutdatedCaches();
+  workbox.registerRoute("/", new workbox.NetworkFirst({
+    "cacheName": "start-url",
+    plugins: [{
+      cacheWillUpdate: async ({
+        response: e
+      }) => e && "opaqueredirect" === e.type ? new Response(e.body, {
+        status: 200,
+        statusText: "OK",
+        headers: e.headers
+      }) : e
+    }, {
+      handlerDidError: async ({
+        request: e
+      }) => "undefined" != typeof self ? self.fallback(e) : Response.error()
+    }]
+  }), 'GET');
+  workbox.registerRoute(/.*/i, new workbox.NetworkOnly({
+    "cacheName": "dev",
+    plugins: [{
+      handlerDidError: async ({
+        request: e
+      }) => "undefined" != typeof self ? self.fallback(e) : Response.error()
+    }]
+  }), 'GET');
+
+}));
+//# sourceMappingURL=sw.js.map
