@@ -57,6 +57,9 @@ export const joinGroup = async (req: Request, res: Response) => {
         group.members.push(userId);
         await group.save();
 
+        const { emitToGroup } = require('../services/socketService');
+        emitToGroup(group._id.toString(), 'group_updated', { type: 'MEMBER_JOINED', userId });
+
         res.json(group);
     } catch (error: any) {
         res.status(500).json({ message: error.message });

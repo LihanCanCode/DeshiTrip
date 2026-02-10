@@ -8,6 +8,7 @@ export interface IExpense extends Document {
     amount: number;
     description: string;
     category: string;
+    isAutoSplit: boolean;
     splitBetween: {
         user?: Types.ObjectId;
         guestName?: string;
@@ -27,6 +28,7 @@ const expenseSchema = new Schema<IExpense>(
         amount: { type: Number, required: true },
         description: { type: String, required: true },
         category: { type: String, default: 'General' },
+        isAutoSplit: { type: Boolean, default: true },
         splitBetween: [
             {
                 user: { type: Schema.Types.ObjectId, ref: 'User' },

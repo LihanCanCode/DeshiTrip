@@ -38,12 +38,18 @@ app.get('/health', (req: Request, res: Response) => {
     res.status(200).json({ status: 'OK', message: 'DeshiTrip API is running', db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected' });
 });
 
+import http from 'http';
+import { initSocket } from './services/socketService';
+
 // Database Connection
 mongoose.connect(MONGODB_URI)
     .then(() => console.log('Connected to MongoDB'))
     .catch((err) => console.error('MongoDB connection error:', err));
 
-app.listen(port, () => {
+const server = http.createServer(app);
+initSocket(server);
+
+server.listen(port, () => {
     console.log(`[server]: API Server is active on http://localhost:${port}`);
 });
 

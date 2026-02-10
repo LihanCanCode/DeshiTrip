@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
 import { MemoryModal } from '@/components/MemoryModal';
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useCallback } from 'react';
 import { Camera } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,8 +14,9 @@ import * as z from 'zod';
 import { useSearchParams, useRouter, useParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import api from '@/utils/api';
-import { isOnline, saveToCache, getFromCache, addToOutbox, getOutbox, removeFromOutbox } from '@/utils/offline';
+import { isOnline, saveToCache, getFromCache, addToOutbox, getOutbox } from '@/utils/offline';
 import { calculateSettlements } from '@/utils/settlements';
+import socket from '@/utils/socket';
 
 const expenseSchema = z.object({
     description: z.string().min(3, 'Description must be at least 3 characters'),
@@ -40,6 +41,7 @@ interface Expense {
     splitBetween?: { user?: string; guestName?: string; amount: number }[];
     date: string;
     createdAt: string;
+    type?: 'Expense' | 'Settlement';
 }
 
 interface Group {
@@ -81,110 +83,7 @@ function ExpensesContent() {
         }
     });
 
-    useEffect(() => {
-        const fetchInitialData = async () => {
-            try {
-                // Cache-First: Immediate load from local storage
-                const cachedGroups = getFromCache('groups') || [];
-                if (cachedGroups.length > 0) {
-                    setGroups(cachedGroups);
-                    // If we have a groupId in URL, try to load its specific cache too
-                    if (groupId) {
-                        const cachedExp = getFromCache(`expenses_${groupId}`);
-                        const cachedSum = getFromCache(`summary_${groupId}`);
-                        if (cachedExp) setExpenses(cachedExp);
-                        if (cachedSum) setSummary(cachedSum);
-                        const group = cachedGroups.find((g: any) => g._id === groupId);
-                        if (group) setSelectedGroup(group);
-                    }
-                    setLoading(false);
-                }
-
-                setLoading(true);
-                let currentGroups: Group[] = [];
-
-                if (isOnline()) {
-                    try {
-                        const groupsRes = await api.get('/groups');
-                        currentGroups = groupsRes.data;
-                        setGroups(currentGroups);
-                        saveToCache('groups', currentGroups);
-                        setError(null);
-                    } catch (apiErr) {
-                        console.error('API Fetch failed, falling back to cache');
-                        currentGroups = getFromCache('groups') || [];
-                        setGroups(currentGroups);
-                    }
-                } else {
-                    currentGroups = getFromCache('groups') || [];
-                    setGroups(currentGroups);
-                    if (currentGroups.length === 0) {
-                        setError(t('noOfflineData') || 'No offline data available');
-                    }
-                }
-
-                // Decide which group to view
-                if (groupId) {
-                    const group = currentGroups.find((g: any) => g._id === groupId);
-                    setSelectedGroup(group || null);
-                    if (group) {
-                        fetchGroupData(groupId);
-                    }
-                } else if (currentGroups.length > 0) {
-                    const firstGroupId = currentGroups[0]._id;
-                    router.push(`/${locale}/dashboard/expenses?groupId=${firstGroupId}`);
-                }
-            } catch (err: any) {
-                const cachedGroups = getFromCache('groups');
-                if (cachedGroups) {
-                    setGroups(cachedGroups);
-                    setError(null);
-                } else {
-                    setError(err.response?.data?.message || 'Failed to load data');
-                }
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchInitialData();
-
-        // Global sync listener
-        const refreshData = () => {
-            console.log('[Expenses] Global sync complete, refreshing...');
-            if (groupId) fetchGroupData(groupId);
-        };
-        window.addEventListener('app:sync-complete', refreshData);
-        return () => window.removeEventListener('app:sync-complete', refreshData);
-    }, [groupId]);
-
-    useEffect(() => {
-        if (typeof window === 'undefined') return;
-        const path = `/${locale}/dashboard/expenses${groupId ? `?groupId=${groupId}` : ''}`;
-        try {
-            localStorage.setItem('deshitrip_lastExpensesPath', path);
-        } catch (err) {
-            console.warn('Unable to persist last expenses path', err);
-        }
-    }, [groupId, locale]);
-
-    useEffect(() => {
-        if (typeof window === 'undefined') return;
-        if (!isOnline()) return;
-        const controller = new AbortController();
-        const currentPath = `${window.location.pathname}${window.location.search}`;
-        fetch(currentPath, {
-            headers: {
-                Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8'
-            },
-            signal: controller.signal
-        }).catch(() => {
-            // ignore warmup failures
-        });
-        return () => controller.abort();
-    }, [groupId]);
-
-    const fetchGroupData = async (id: string) => {
+    const fetchGroupData = useCallback(async (id: string) => {
         try {
             if (isOnline()) {
                 const [expensesRes, summaryRes, groupsRes] = await Promise.all([
@@ -216,15 +115,136 @@ function ExpensesContent() {
                 setExpenses(allExpenses);
 
                 // Re-calculate summary locally
-                const localSummary = calculateSettlements(allExpenses as any);
-                setSummary(localSummary);
+                const localSummaryCalc = calculateSettlements(allExpenses as any);
+                setSummary(localSummaryCalc);
             }
         } catch (err: any) {
             console.error('Failed to fetch group data', err);
             setExpenses(getFromCache(`expenses_${id}`) || []);
             setSummary(getFromCache(`summary_${id}`) || null);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        const fetchInitialData = async () => {
+            try {
+                // Cache-First: Immediate load from local storage
+                const cachedGroups = getFromCache('groups') || [];
+                if (cachedGroups.length > 0) {
+                    setGroups(cachedGroups);
+                    if (groupId) {
+                        const cachedExp = getFromCache(`expenses_${groupId}`);
+                        const cachedSum = getFromCache(`summary_${groupId}`);
+                        if (cachedExp) setExpenses(cachedExp);
+                        if (cachedSum) setSummary(cachedSum);
+                        const groupHost = cachedGroups.find((g: any) => g._id === groupId);
+                        if (groupHost) setSelectedGroup(groupHost);
+                    }
+                    setLoading(false);
+                }
+
+                setLoading(true);
+                let currentGroups: Group[] = [];
+
+                if (isOnline()) {
+                    try {
+                        const groupsRes = await api.get('/groups');
+                        currentGroups = groupsRes.data;
+                        setGroups(currentGroups);
+                        saveToCache('groups', currentGroups);
+                        setError(null);
+                    } catch (apiErr) {
+                        console.error('API Fetch failed, falling back to cache');
+                        currentGroups = getFromCache('groups') || [];
+                        setGroups(currentGroups);
+                    }
+                } else {
+                    currentGroups = getFromCache('groups') || [];
+                    setGroups(currentGroups);
+                    if (currentGroups.length === 0) {
+                        setError(t('noOfflineData') || 'No offline data available');
+                    }
+                }
+
+                if (groupId) {
+                    const groupToView = currentGroups.find((g: any) => g._id === groupId);
+                    setSelectedGroup(groupToView || null);
+                    if (groupToView) {
+                        fetchGroupData(groupId);
+                    }
+                } else if (currentGroups.length > 0) {
+                    const firstGroupId = currentGroups[0]._id;
+                    router.push(`/${locale}/dashboard/expenses?groupId=${firstGroupId}`);
+                }
+            } catch (err: any) {
+                const cachedGroupsAlt = getFromCache('groups');
+                if (cachedGroupsAlt) {
+                    setGroups(cachedGroupsAlt);
+                    setError(null);
+                } else {
+                    setError(err.response?.data?.message || 'Failed to load data');
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchInitialData();
+
+        const refreshData = () => {
+            console.log('[Expenses] Global sync complete, refreshing...');
+            if (groupId) fetchGroupData(groupId);
+        };
+        window.addEventListener('app:sync-complete', refreshData);
+        return () => window.removeEventListener('app:sync-complete', refreshData);
+    }, [groupId, fetchGroupData, locale, router, t]);
+
+    useEffect(() => {
+        if (groupId && isOnline()) {
+            socket.connect();
+            socket.emit('join_group', groupId);
+
+            const handleUpdate = (data: any) => {
+                console.log('[socket]: Group updated received:', data);
+                fetchGroupData(groupId);
+
+                if (data.type === 'MEMBER_JOINED') {
+                    console.log('A new member has joined the group!');
+                }
+            };
+
+            socket.on('group_updated', handleUpdate);
+
+            return () => {
+                socket.off('group_updated', handleUpdate);
+                socket.disconnect();
+            };
+        }
+    }, [groupId, fetchGroupData]);
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const path = `/${locale}/dashboard/expenses${groupId ? `?groupId=${groupId}` : ''}`;
+        try {
+            localStorage.setItem('deshitrip_lastExpensesPath', path);
+        } catch (err) {
+            console.warn('Unable to persist last expenses path', err);
+        }
+    }, [groupId, locale]);
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        if (!isOnline()) return;
+        const controller = new AbortController();
+        const currentPath = `${window.location.pathname}${window.location.search}`;
+        fetch(currentPath, {
+            headers: {
+                Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8'
+            },
+            signal: controller.signal
+        }).catch(() => { });
+        return () => controller.abort();
+    }, [groupId]);
 
     const onSubmit = async (data: ExpenseFormValues) => {
         if (!selectedGroup) return;
@@ -249,6 +269,8 @@ function ExpensesContent() {
             amount,
             description: data.description,
             category: data.category,
+            isAutoSplit: true,
+            type: 'Expense',
             splitBetween
         };
 
@@ -262,7 +284,6 @@ function ExpensesContent() {
                 alert(err.response?.data?.message || 'Failed to add expense');
             }
         } else {
-            // Optimistic UI
             const currentUser = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
             const optimisticExpense: Expense = {
                 _id: 'temp-' + Date.now(),
@@ -274,7 +295,8 @@ function ExpensesContent() {
                     name: currentUser.name || 'Me'
                 },
                 date: new Date().toISOString(),
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                type: 'Expense'
             };
 
             const updatedExpenses = [optimisticExpense, ...expenses];
@@ -282,9 +304,8 @@ function ExpensesContent() {
             saveToCache(`expenses_${selectedGroup._id}`, updatedExpenses);
             addToOutbox('ADD_EXPENSE', payload);
 
-            // Re-calculate summary immediately
-            const localSummary = calculateSettlements(updatedExpenses as any);
-            setSummary(localSummary);
+            const localSummaryCalc = calculateSettlements(updatedExpenses as any);
+            setSummary(localSummaryCalc);
 
             setIsModalOpen(false);
             reset();
@@ -292,10 +313,7 @@ function ExpensesContent() {
         }
     };
 
-    // Memory Modal State
     const [isMemoryModalOpen, setIsMemoryModalOpen] = useState(false);
-
-    // Settlement Logic
     const [isSettlementModalOpen, setIsSettlementModalOpen] = useState(false);
     const [settlementPayer, setSettlementPayer] = useState('');
     const [settlementReceiver, setSettlementReceiver] = useState('');
@@ -315,12 +333,10 @@ function ExpensesContent() {
             splitBetween: []
         };
 
-        // Handle Payer
         if (settlementPayer.startsWith('guest:')) {
             payload.payerGuestName = settlementPayer.replace('guest:', '');
         }
 
-        // Handle Receiver
         if (settlementReceiver.startsWith('guest:')) {
             payload.splitBetween.push({
                 guestName: settlementReceiver.replace('guest:', ''),
@@ -352,10 +368,11 @@ function ExpensesContent() {
                 category: 'Settlement',
                 paidBy: {
                     _id: settlementPayer.startsWith('guest:') ? 'guest' : settlementPayer,
-                    name: settlementPayer.replace('guest:', '').split(':')[0] // Just in case
+                    name: settlementPayer.replace('guest:', '').split(':')[0]
                 },
                 date: new Date().toISOString(),
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                type: 'Settlement'
             };
 
             const updatedExpenses = [optimisticSettlement, ...expenses];
@@ -371,7 +388,9 @@ function ExpensesContent() {
         }
     };
 
-    const totalSpend = expenses.reduce((acc, curr) => acc + curr.amount, 0);
+    const totalSpend = expenses
+        .filter(exp => exp.type !== 'Settlement' && exp.category !== 'Settlement')
+        .reduce((acc, curr) => acc + curr.amount, 0);
 
     if (loading) {
         return (
@@ -443,7 +462,6 @@ function ExpensesContent() {
                 </div>
             </div>
 
-            {/* Trip Memory Card */}
             {selectedGroup?.coverImage && (
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -487,7 +505,6 @@ function ExpensesContent() {
                 </motion.div>
             )}
 
-            {/* Summary Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="glass p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] border-white/10 bg-gradient-to-br from-white/[0.05] to-transparent col-span-1 sm:col-span-2 relative overflow-hidden group">
                     <div className="relative z-10">
@@ -523,7 +540,6 @@ function ExpensesContent() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Recent Expenses */}
                 <div className="lg:col-span-2 space-y-6">
                     <div className="flex items-center justify-between px-2">
                         <h2 className="text-xl md:text-2xl font-black tracking-tighter text-white uppercase">{t('ledger')}</h2>
@@ -569,7 +585,6 @@ function ExpensesContent() {
                     )}
                 </div>
 
-                {/* Settlement Summary */}
                 <div className="space-y-6">
                     <div className="flex items-center justify-between px-2">
                         <h2 className="text-xl md:text-2xl font-black tracking-tighter text-white uppercase">{t('settlements')}</h2>
@@ -620,7 +635,6 @@ function ExpensesContent() {
                 </div>
             </div>
 
-            {/* Add Expense Modal */}
             <Modal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
@@ -692,7 +706,6 @@ function ExpensesContent() {
                 </form>
             </Modal>
 
-            {/* Memory Modal */}
             <MemoryModal
                 isOpen={isMemoryModalOpen}
                 onClose={() => setIsMemoryModalOpen(false)}
@@ -700,7 +713,6 @@ function ExpensesContent() {
                 onSuccess={() => fetchGroupData(selectedGroup?._id || '')}
             />
 
-            {/* Settlement Modal */}
             <Modal
                 isOpen={isSettlementModalOpen}
                 onClose={() => setIsSettlementModalOpen(false)}
@@ -775,7 +787,6 @@ function ExpensesContent() {
 }
 
 export default function ExpensesPage() {
-    const t = useTranslations('Expenses');
     return (
         <Suspense fallback={
             <div className="h-[60vh] flex flex-col items-center justify-center gap-4 text-zinc-500">

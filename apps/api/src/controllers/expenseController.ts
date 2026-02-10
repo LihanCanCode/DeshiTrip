@@ -3,21 +3,22 @@ import { Expense } from '../models/Expense';
 
 export const createExpense = async (req: Request, res: Response) => {
     try {
-        const { group, amount, description, category, splitBetween, payerGuestName, type } = req.body;
+        const { group: groupId, amount, description, category, splitBetween, payerGuestName, type, isAutoSplit } = req.body;
         const userId = (req as any).user.id;
 
         // If payerGuestName is provided, use it. Otherwise default to logged-in user.
         const paidBy = payerGuestName ? undefined : userId;
 
-        console.log("Creating Entry:", { group, amount, description, category, splitBetween, paidBy, payerGuestName, type });
+        console.log("Creating Entry:", { groupId, amount, description, category, splitBetween, paidBy, payerGuestName, type, isAutoSplit });
 
         const expenseData: any = {
-            group,
+            group: groupId,
             payerGuestName,
             type: type || 'Expense',
             amount,
             description,
             category,
+            isAutoSplit: isAutoSplit !== undefined ? isAutoSplit : true,
             splitBetween,
         };
 
@@ -28,6 +29,10 @@ export const createExpense = async (req: Request, res: Response) => {
         const expense = new Expense(expenseData);
 
         await expense.save();
+
+        const { emitToGroup } = require('../services/socketService');
+        emitToGroup(groupId, 'group_updated', { type: 'EXPENSE_ADDED', expenseId: expense._id });
+
         res.status(201).json(expense);
     } catch (error: any) {
         console.error("Expense Creation Error:", error);
@@ -49,16 +54,26 @@ export const getGroupExpenses = async (req: Request, res: Response) => {
 
 import { User } from '../models/User';
 
+import { Group } from '../models/Group';
+
 export const getExpenseSummary = async (req: Request, res: Response) => {
     try {
         const { groupId } = req.params;
         const expenses = await Expense.find({ group: groupId });
+        const group = await Group.findById(groupId);
+
+        if (!group) {
+            return res.status(404).json({ message: 'Group not found' });
+        }
 
         const balances: { [key: string]: number } = {};
         const userIds = new Set<string>();
 
+        // Current pool of people for auto-split
+        const totalMemberCount = group.members.length + group.guests.length;
+
         expenses.forEach(exp => {
-            // PaidBy gets positive balance (They paid, so they are owed money/credit)
+            // 1. Handle Payer (Owed money)
             if (exp.payerGuestName) {
                 const key = `guest:${exp.payerGuestName}`;
                 balances[key] = (balances[key] || 0) + exp.amount;
@@ -68,19 +83,34 @@ export const getExpenseSummary = async (req: Request, res: Response) => {
                 userIds.add(paidById);
             }
 
-            // Those who split get negative balance (They consumed/received, so they owe money)
-            exp.splitBetween.forEach(split => {
-                if (split.user) {
-                    const userId = split.user.toString();
-                    balances[userId] = (balances[userId] || 0) - split.amount;
-                    userIds.add(userId);
-                } else {
-                    const guestName = split.guestName || 'Unknown';
-                    // Prefix guest names to avoid ID collision (though unlikely)
-                    const key = `guest:${guestName}`;
-                    balances[key] = (balances[key] || 0) - split.amount;
-                }
-            });
+            // 2. Handle Splitting (Owe money)
+            if (exp.isAutoSplit && exp.type === 'Expense') {
+                // Dynamic splitting across ALL CURRENT members and guests
+                const splitAmount = exp.amount / totalMemberCount;
+
+                group.members.forEach(memberId => {
+                    const mId = memberId.toString();
+                    balances[mId] = (balances[mId] || 0) - splitAmount;
+                    userIds.add(mId);
+                });
+
+                group.guests.forEach(guest => {
+                    const key = `guest:${guest.name}`;
+                    balances[key] = (balances[key] || 0) - splitAmount;
+                });
+            } else {
+                // Fixed/Manual splitting
+                exp.splitBetween.forEach(split => {
+                    if (split.user) {
+                        const userId = split.user.toString();
+                        balances[userId] = (balances[userId] || 0) - split.amount;
+                        userIds.add(userId);
+                    } else if (split.guestName) {
+                        const key = `guest:${split.guestName}`;
+                        balances[key] = (balances[key] || 0) - split.amount;
+                    }
+                });
+            }
         });
 
         // Resolve User IDs to Names
