@@ -83,6 +83,7 @@
         "title": "Expenses",
         "subtitle": "Tracking precisely every Taka spent on your adventure.",
         "addCost": "Add Cost",
+        "scanMemo": "Scan Memo",
         "memory": "Memory",
         "loadingData": "Loading adventure data...",
         "initializingVault": "Initializing vault...",
@@ -141,6 +142,7 @@
         "searchPlaceholder": "Search groups...",
         "noOfflineData": "No offline data available",
         "offlineMode": "Viewing offline data",
+        "connectionErrorUsingCache": "Connection error. Showing cached data.",
         "createGroupModal": {
             "title": "Create New Group",
             "groupName": "Group Name",

@@ -1,9 +1,13 @@
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Load .env file at the very top before any route imports
+dotenv.config({ path: path.join(__dirname, '../.env') });
+
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import dotenv from 'dotenv';
-import path from 'path';
 import mongoose from 'mongoose';
 import authRoutes from './routes/authRoutes';
 import groupRoutes from './routes/groupRoutes';
@@ -13,16 +17,13 @@ import blogRoutes from './routes/blogRoutes';
 import uploadRoutes from './routes/uploadRoutes';
 import aiPlannerRoutes from './routes/aiPlannerRoutes';
 
-// Load .env file from the api directory
-dotenv.config({ path: path.join(__dirname, '../.env') });
-
 const app: Application = express();
 const port = process.env.PORT || 8000;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/deshitrip';
 
 app.use(helmet());
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 app.use(morgan('dev'));
 
 // Routes

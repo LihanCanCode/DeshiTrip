@@ -1,12 +1,12 @@
 "use client";
 
 import { motion } from 'framer-motion';
-import { Wallet, Plus, ArrowUpRight, ArrowDownLeft, PieChart, Users, TrendingUp, AlertCircle, Loader2, WifiOff } from 'lucide-react';
+import { Wallet, Plus, ArrowUpRight, ArrowDownLeft, PieChart, Users, TrendingUp, AlertCircle, Loader2, WifiOff, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
 import { MemoryModal } from '@/components/MemoryModal';
-import { useState, useEffect, Suspense, useCallback } from 'react';
+import { useState, useEffect, Suspense, useCallback, useRef } from 'react';
 import { Camera } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -53,6 +53,7 @@ interface Group {
     memoryNote?: string;
     milestones?: string;
     foodieStat?: string;
+    inviteCode: string;
 }
 
 function ExpensesContent() {
@@ -75,6 +76,7 @@ function ExpensesContent() {
         register,
         handleSubmit,
         reset,
+        setValue,
         formState: { errors },
     } = useForm<ExpenseFormValues>({
         resolver: zodResolver(expenseSchema),
@@ -124,6 +126,51 @@ function ExpensesContent() {
             setSummary(getFromCache(`summary_${id}`) || null);
         }
     }, []);
+
+    const [copied, setCopied] = useState(false);
+
+    const handleCopyCode = () => {
+        if (!selectedGroup?.inviteCode) return;
+        navigator.clipboard.writeText(selectedGroup.inviteCode);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    const [isScanning, setIsScanning] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleScanReceipt = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setIsScanning(true);
+        try {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onloadend = async () => {
+                try {
+                    const base64Image = reader.result as string;
+                    const response = await api.post('/expenses/scan', { image: base64Image });
+                    const { description, amount, category } = response.data;
+
+                    // Pre-fill the form and open modal
+                    setValue('description', description);
+                    setValue('amount', amount.toString());
+                    setValue('category', category || 'Food');
+                    setIsModalOpen(true);
+                } catch (apiErr: any) {
+                    alert('AI Scan failed: ' + (apiErr.response?.data?.message || apiErr.message));
+                } finally {
+                    setIsScanning(false);
+                }
+            };
+        } catch (err: any) {
+            console.error('Scan error:', err);
+            setIsScanning(false);
+        } finally {
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+    };
 
     useEffect(() => {
         const fetchInitialData = async () => {
@@ -433,13 +480,25 @@ function ExpensesContent() {
                 <div className="w-full">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
                         <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase">{t('title')}</h1>
-                        <span className="w-fit px-3 py-1 bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest rounded-full border border-emerald-500/20">
-                            {selectedGroup?.name || t('loadingData')}
-                        </span>
+                        <div className="flex items-center gap-2">
+                            <span className="w-fit px-3 py-1 bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest rounded-full border border-emerald-500/20">
+                                {selectedGroup?.name || t('loadingData')}
+                            </span>
+                            {selectedGroup?.inviteCode && (
+                                <button
+                                    onClick={handleCopyCode}
+                                    className="flex items-center gap-1.5 px-3 py-1 bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white text-[10px] font-bold uppercase tracking-wider rounded-full border border-white/5 transition-all group"
+                                    title="Copy Invite Code"
+                                >
+                                    {copied ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3 group-hover:scale-110 transition-transform" />}
+                                    {selectedGroup.inviteCode}
+                                </button>
+                            )}
+                        </div>
                     </div>
                     <p className="text-zinc-500 font-medium text-sm md:text-base">{t('subtitle')}</p>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+                <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-center">
                     <select
                         value={groupId || ''}
                         onChange={(e) => router.push(`/${locale}/dashboard/expenses?groupId=${e.target.value}`)}
@@ -449,14 +508,37 @@ function ExpensesContent() {
                             <option key={g._id} value={g._id}>{g.name}</option>
                         ))}
                     </select>
-                    <div className="flex gap-3 w-full sm:w-auto">
-                        <Button onClick={() => setIsMemoryModalOpen(true)} className="flex-1 sm:flex-none rounded-2xl h-14 px-6 bg-zinc-800 text-zinc-300 hover:text-white" size="lg">
-                            <Camera className="mr-2 w-5 h-5" />
-                            {t('memory')}
-                        </Button>
-                        <Button onClick={() => setIsModalOpen(true)} className="flex-1 sm:flex-none rounded-2xl h-14 px-8 shadow-xl shadow-emerald-500/20" size="lg">
+                    <div className="flex gap-2 w-full sm:w-auto">
+                        <Button
+                            onClick={() => setIsModalOpen(true)}
+                            className="flex-1 sm:flex-none rounded-2xl h-14 px-8 bg-emerald-500 text-white hover:bg-emerald-600 shadow-xl shadow-emerald-500/20 font-black uppercase tracking-widest text-[10px]"
+                            size="lg"
+                        >
                             <Plus className="mr-2 w-5 h-5" />
                             {t('addCost')}
+                        </Button>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            capture="environment"
+                            className="hidden"
+                            ref={fileInputRef}
+                            onChange={handleScanReceipt}
+                        />
+                        <Button
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={isScanning}
+                            className="flex-1 sm:flex-none rounded-2xl h-14 px-6 bg-blue-600/10 text-blue-500 border border-blue-500/20 hover:bg-blue-600 hover:text-white transition-all shadow-xl shadow-blue-500/10 font-black uppercase tracking-widest text-[10px]"
+                            size="lg"
+                        >
+                            {isScanning ? (
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                            ) : (
+                                <Camera className="mr-2 w-5 h-5" />
+                            )}
+                            <span className="whitespace-nowrap">
+                                {isScanning ? 'Scanning...' : t('scanMemo')}
+                            </span>
                         </Button>
                     </div>
                 </div>
@@ -474,6 +556,17 @@ function ExpensesContent() {
                         className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
+
+                    {/* Memory Trigger Button Overlay */}
+                    <div className="absolute top-6 right-6 md:top-10 md:right-10 z-20">
+                        <Button
+                            onClick={() => setIsMemoryModalOpen(true)}
+                            className="rounded-2xl h-12 px-6 bg-black/40 backdrop-blur-md border border-white/20 text-white hover:bg-black/60 shadow-2xl transition-all font-black uppercase tracking-widest text-[10px]"
+                        >
+                            <Camera className="mr-2 w-4 h-4 text-emerald-400" />
+                            {t('memory')}
+                        </Button>
+                    </div>
                     <div className="absolute bottom-6 left-6 right-6 md:bottom-10 md:left-10 md:right-10">
                         <div className="flex items-center gap-3 mb-2 md:mb-4">
                             <div className="px-3 py-1 md:px-4 md:py-1.5 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-white">

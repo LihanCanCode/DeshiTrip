@@ -83,6 +83,7 @@
         "title": "খরচাপাতি",
         "subtitle": "আপনার অ্যাডভেঞ্চারে ব্যয় করা প্রতিটি টাকার সঠিক হিসাব রাখা হচ্ছে।",
         "addCost": "খরচ যোগ করুন",
+        "scanMemo": "মেমো স্ক্যান করুন",
         "memory": "স্মৃতি",
         "loadingData": "অ্যাডভেঞ্চার ডেটা লোড হচ্ছে...",
         "initializingVault": "ভল্ট শুরু হচ্ছে...",
@@ -141,6 +142,7 @@
         "searchPlaceholder": "গ্রুপ খুঁজুন...",
         "noOfflineData": "কোন অফলাইন ডেটা নেই",
         "offlineMode": "অফলাইন ডেটা দেখা হচ্ছে",
+        "connectionErrorUsingCache": "লিংক সমস্যা। ক্যাশে ডেটা দেখানো হচ্ছে।",
         "createGroupModal": {
             "title": "নতুন গ্রুপ তৈরি করুন",
             "groupName": "গ্রুপের নাম",

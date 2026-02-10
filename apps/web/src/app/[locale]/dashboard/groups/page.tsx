@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from 'framer-motion';
-import { Plus, Users, MapPin, Search, ArrowRight, UserPlus, AlertCircle, X } from 'lucide-react';
+import { Plus, Users, MapPin, Search, ArrowRight, UserPlus, AlertCircle, X, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
@@ -48,6 +48,13 @@ export default function GroupsPage() {
     const [groups, setGroups] = useState<Group[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [copiedId, setCopiedId] = useState<string | null>(null);
+
+    const handleCopyCode = (code: string, id: string) => {
+        navigator.clipboard.writeText(code);
+        setCopiedId(id);
+        setTimeout(() => setCopiedId(null), 2000);
+    };
 
     // Guest Management State
     const [guestInput, setGuestInput] = useState('');
@@ -288,9 +295,17 @@ export default function GroupsPage() {
                                     <div className="px-4 py-2 rounded-xl text-[10px] font-black tracking-widest uppercase border bg-emerald-500/10 border-emerald-500/20 text-emerald-500">
                                         Active
                                     </div>
-                                    <div className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">
-                                        ID: {group.inviteCode}
-                                    </div>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleCopyCode(group.inviteCode, group._id);
+                                        }}
+                                        className="flex items-center gap-1.5 px-3 py-1 bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white text-[10px] font-bold uppercase tracking-wider rounded-full border border-white/5 transition-all group/copy"
+                                        title="Copy Invite Code"
+                                    >
+                                        {copiedId === group._id ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3 group-hover/copy:scale-110 transition-transform" />}
+                                        {group.inviteCode}
+                                    </button>
                                 </div>
                             </div>
 
