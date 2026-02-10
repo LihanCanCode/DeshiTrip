@@ -648,8 +648,8 @@ function ExpensesContent() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-                <div className="lg:col-span-3 space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div className="lg:col-span-7 space-y-6">
                     <div className="flex items-center justify-between px-2">
                         <h2 className="text-xl md:text-2xl font-black tracking-tighter text-white uppercase">{t('ledger')}</h2>
                         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600 hidden sm:inline">{t('secureRecords')}</span>
@@ -694,7 +694,7 @@ function ExpensesContent() {
                     )}
                 </div>
 
-                <div className="space-y-6">
+                <div className="lg:col-span-5 space-y-6">
                     <div className="flex items-center justify-between px-2">
                         <h2 className="text-xl md:text-2xl font-black tracking-tighter text-white uppercase">{t('settlements')}</h2>
                         {!isOnline() && (
@@ -744,7 +744,7 @@ function ExpensesContent() {
                 </div>
 
                 {/* Activity Feed - Desktop Sidebar (LG+ screens) */}
-                <div className="hidden lg:block lg:col-span-2 h-[700px] sticky top-24">
+                <div className="hidden lg:block lg:col-span-12 h-[700px]">
                     <ActivityFeed activities={activities} />
                 </div>
             </div>
