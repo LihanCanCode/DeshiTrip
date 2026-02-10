@@ -18,13 +18,13 @@ DesiTrip is a bilingual travel companion that keeps tour squads organised, uncov
 ## 💡 The Pitch
 
 ### 📍 The Problem
-Tourists in Bangladesh face three major hurdles: **Information Fragmentation**, **Connectivity Gaps** in remote spots (like the Hill Tracts or Sundarbans), and **Language Barriers** when using generic global travel tools that don't understand local nuances or the Bengali language.
+Tourists in Bangladesh face four major hurdles: **Information Fragmentation**, **Connectivity Gaps** in remote spots (like the Hill Tracts or Sundarbans), **Language Barriers**, and **Safety Concerns** when exploring isolated trails.
 
 ### 🛠️ The Approach
-We built DesiTrip as a **Monorepo** powerhouse to ensure high-speed development and synchronized data models. By combining **Google Gemini's LLM capabilities** with a robust **Offline-First PWA architecture**, we created a tool that is both "Smart" and "Reliable" regardless of where the trail leads.
+We built DesiTrip as a **Monorepo** powerhouse to ensure high-speed development and synchronized data models. By combining **Google Gemini's AI capabilities** with a robust **Offline-First PWA architecture** and **Real-time SOS broadcasting**, we created a tool that is smart, reliable, and secure.
 
 ### ✅ The Solution
-**DesiTrip** is a unified bilingual travel companion. It captures expenses offline, generates custom Bengali itineraries using AI, and provides a curated gateway to the 64 districts of Bangladesh—all while keeping your travel squad in sync.
+**DesiTrip** is a unified bilingual travel companion. It captures expenses offline, generates custom AI itineraries, provides a curated gateway to Bangladesh, and **guarantees traveler safety** with a high-stakes emergency SOS system that broadcasts voice and location even in low-bandwidth zones.
 
 ---
 
