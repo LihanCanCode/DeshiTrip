@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import Alert from '../models/Alert';
 import { Group } from '../models/Group';
 import { emitToGroup } from '../services/socketService';
+import { sendSOSMS } from '../services/smsService';
+import { User } from '../models/User';
 
 export const triggerSOS = async (req: Request, res: Response) => {
     try {
@@ -34,8 +36,14 @@ export const triggerSOS = async (req: Request, res: Response) => {
 
         await newAlert.save();
 
-        // Populate user info for the socket event
+        // Populate user info for the socket event and SMS
         const populatedAlert = await Alert.findById(newAlert._id).populate('user', 'name email');
+        const user = populatedAlert?.user as any;
+
+        // Trigger SMS alert
+        if (user && location) {
+            sendSOSMS(user.name, location).catch(err => console.error('SMS trigger failed', err));
+        }
 
         // Emit to each group
         groupIds.forEach((groupId: any) => {

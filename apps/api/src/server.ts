@@ -56,6 +56,13 @@ initSocket(server);
 
 server.listen(port, () => {
     console.log(`[server]: API Server is active on http://localhost:${port}`);
+
+    // Twilio Diagnostics
+    console.log('--- Twilio Config Check ---');
+    console.log('Account SID:', process.env.TWILIO_ACCOUNT_SID ? '✅ Found' : '❌ Missing');
+    console.log('Auth Token:', process.env.TWILIO_AUTH_TOKEN ? '✅ Found' : '❌ Missing');
+    console.log('Msg Service SID:', process.env.TWILIO_MESSAGING_SERVICE_SID ? '✅ Found' : '❌ Missing');
+    console.log('--- End Config Check ---');
 });
 
 export default app;
