@@ -74,7 +74,8 @@ export default function AIPlannerPage() {
 
         try {
             const token = localStorage.getItem("token");
-            const response = await fetch(`http://localhost:8000/api/ai-planner/generate`, {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+            const response = await fetch(`${apiUrl}/api/ai-planner/generate`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
