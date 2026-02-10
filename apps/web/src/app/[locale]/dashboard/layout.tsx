@@ -5,6 +5,11 @@ import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/Logo";
+import { SOSButton } from "@/components/SOSButton";
+import { SOSAlertOverlay } from "@/components/SOSAlertOverlay";
+import { useEffect } from "react";
+import socket from "@/utils/socket";
+import api from "@/utils/api";
 
 export default function DashboardLayout({
     children,
@@ -12,6 +17,27 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    useEffect(() => {
+        const joinRooms = async () => {
+            try {
+                const response = await api.get('/groups');
+                const groups = response.data;
+
+                if (!socket.connected) {
+                    socket.connect();
+                }
+
+                groups.forEach((group: any) => {
+                    socket.emit('join_group', group._id);
+                });
+            } catch (err) {
+                console.error("Failed to join group rooms:", err);
+            }
+        };
+
+        joinRooms();
+    }, []);
 
     return (
         <div className="flex h-screen bg-[#060a08] text-white overflow-hidden relative">
@@ -42,6 +68,9 @@ export default function DashboardLayout({
                         {children}
                     </motion.div>
                 </div>
+
+                <SOSButton />
+                <SOSAlertOverlay />
             </main>
         </div>
     );
