@@ -88,9 +88,11 @@ export const updateGroupMemory = async (req: Request, res: Response) => {
         if (!group) return res.status(404).json({ message: 'Group not found' });
 
         // Only members can update memory
-        if (!group.members.includes(userId)) {
+        if (!group.members.some(memberId => memberId.toString() === userId)) {
             return res.status(403).json({ message: 'Only members can update memory' });
         }
+
+        console.log('[updateGroupMemory] Updating with:', { coverImage, memoryNote });
 
         if (coverImage) group.coverImage = coverImage;
         if (memoryNote !== undefined) group.memoryNote = memoryNote;

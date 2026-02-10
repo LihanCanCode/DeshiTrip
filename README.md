@@ -51,6 +51,12 @@ Unlike global travel apps, DesiTrip is engineered for the Bangladeshi ecosystem:
 - **Resilient Dashboard**: Your recent groups, expense summaries, and summaries are cached on-device for 100% usability without cellular coverage.
 - **Offline Actions**: Queue new expenses and view itineraries even in deep-forest or high-altitude zones.
 
+### 🛡️ Safety & SOS Alerts
+- **Hold-to-Trigger SOS**: A high-stakes 3-second hold mechanism to prevent accidental emergency signals.
+- **Automatic Voice Capture**: Every SOS activation automatically records a 10-second voice message of the user's surroundings.
+- **Real-Time Group Broadcast**: Instantly transmits the user's live location and voice message to all group members via Socket.io.
+- **Fail-Safe Audio**: Built-in Web Audio API synthesis ensures emergency alert sounds play even on restricted browsers or low-bandwidth connections.
+
 ### 🔒 Security & Localization
 - **Enterprise-Grade Auth**: Secure login via JWT, Argon2 password hashing, and protected API middleware.
 - **Native Experience**: Full localization support for English (en) and Bengali (bn). The AI planner intelligently responds in your preferred language.
@@ -62,6 +68,11 @@ Unlike global travel apps, DesiTrip is engineered for the Bangladeshi ecosystem:
 ### 🧠 Intelligence Suite
 - **Google Gemini 1.5 Pro**: Orchestrates the AI Planner. We utilize specialized system prompts to enforce **locale-aware generation** (Bengali responses with English JSON keys) and enforce budget-friendly traveling constraints specific to the Bangladeshi economy.
 - **OpenRouteService (ORS) API**: Handles real-time route calculations, distance estimation, and travel time for the "Spot Explore" feature.
+
+### 📡 Real-Time & Audio Engineering
+- **Socket.io Sync**: A robust bi-directional communication layer handles instant SOS alerts across sessions. Includes polling fallbacks and 10MB payload capacity for voice data.
+- **Web Audio API Fallback**: Uses square-wave oscillators to synthesize emergency distractors locally, bypassing browser autoplay restrictions and missing asset errors.
+- **MediaRecorder API**: Safely captures high-quality audio chunks across mobile and desktop browsers during emergency events.
 
 ### 🌐 Internationalization (i18n) Strategy
 - Built with **next-intl**, the app maintains a unified locale state across the client, server, and AI requests. 

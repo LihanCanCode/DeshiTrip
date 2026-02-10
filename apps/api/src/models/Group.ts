@@ -15,6 +15,8 @@ export interface IGroup extends Document {
     memoryNote?: string;
     milestones?: string;
     foodieStat?: string;
+    status: 'active' | 'finished';
+    finishedAt?: Date;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -37,6 +39,8 @@ const groupSchema = new Schema<IGroup>(
         memoryNote: { type: String, default: '' },
         milestones: { type: String, default: '' },
         foodieStat: { type: String, default: '' },
+        status: { type: String, enum: ['active', 'finished'], default: 'active' },
+        finishedAt: { type: Date },
     },
     { timestamps: true }
 );

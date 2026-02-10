@@ -6,6 +6,14 @@ export interface IUser extends Document {
     passwordHash: string;
     avatar?: string;
     role: 'user' | 'admin';
+    xp: number;
+    badges: {
+        name: string;
+        icon: string;
+        description: string;
+        earnedAt: Date;
+        groupId?: string;
+    }[];
     createdAt: Date;
     updatedAt: Date;
 }
@@ -17,6 +25,16 @@ const userSchema = new Schema<IUser>(
         passwordHash: { type: String, required: true },
         avatar: { type: String },
         role: { type: String, enum: ['user', 'admin'], default: 'user' },
+        xp: { type: Number, default: 0 },
+        badges: [
+            {
+                name: { type: String, required: true },
+                icon: { type: String, required: true },
+                description: { type: String, required: true },
+                earnedAt: { type: Date, default: Date.now },
+                groupId: { type: String }
+            },
+        ],
     },
     { timestamps: true }
 );

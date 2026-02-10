@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { createGroup, getGroups, joinGroup, updateGroupMemory } from '../controllers/groupController';
+import { finishTour, getTourSummary } from '../controllers/badgeController';
 import { authMiddleware } from '../middleware/authMiddleware';
 
 const router: Router = Router();
@@ -22,6 +23,8 @@ router.get('/', (req, res, next) => {
 });
 
 router.post('/join', joinGroup);
+router.post('/:id/finish', finishTour);
+router.get('/:id/summary', getTourSummary);
 router.patch('/:id/memory', updateGroupMemory);
 
 export default router;
