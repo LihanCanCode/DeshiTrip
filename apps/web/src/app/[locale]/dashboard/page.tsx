@@ -41,8 +41,8 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({
         activeGroups: 0,
-        spotsExplored: 3, // Mocked for now
-        plannedTours: 1   // Mocked for now
+        spotsExplored: 0,
+        plannedTours: 0
     });
 
     const [guestInput, setGuestInput] = useState('');
@@ -62,12 +62,25 @@ export default function DashboardPage() {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const response = await api.get('/groups');
-            setGroups(response.data);
-            setStats(prev => ({
-                ...prev,
-                activeGroups: response.data.length
-            }));
+            const [groupsRes, profileRes] = await Promise.all([
+                api.get('/groups'),
+                api.get('/auth/me')
+            ]);
+
+            const groupsData = groupsRes.data;
+            const profileData = profileRes.data;
+
+            setGroups(groupsData);
+
+            // Calculate real stats
+            // Spots explored: Filter badges that have description containing "Explored" or just count unique badges
+            const uniqueSpots = new Set(profileData.badges?.map((b: any) => b.name) || []);
+
+            setStats({
+                activeGroups: groupsData.length,
+                spotsExplored: uniqueSpots.size,
+                plannedTours: groupsData.length // Every group is a tour
+            });
         } catch (err) {
             console.error('Failed to fetch dashboard data', err);
         } finally {

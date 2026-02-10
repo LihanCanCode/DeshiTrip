@@ -41,6 +41,7 @@ Unlike global travel apps, DesiTrip is engineered for the Bangladeshi ecosystem:
 - **Dynamic Itinerary Generator**: Custom, budget-optimized travel plans across 64 districts of Bangladesh, powered by Google Gemini.
 - **Contextual Recommendation Engine**: Curated spotlight cards for gems like Sajek, Sylhet, and Sundarbans, featuring regional food guides and "hidden spot" alerts.
 - **Smart Budgeting**: Tailored insights for domestic travel, including local transport (bus/launch/train) cost estimations.
+- **AI Smart Scanning (OCR)**: Instantly extract entries from travel memos and paper receipts using Gemini-powered vision. Auto-populates description, amount (with Bengali-to-English conversion), and category.
 
 ### 👥 Squad & Expense Management
 - **Squad Hub**: Create travel crews with unique invite codes. Manage members and "phantom guests" (for non-app users) with ease.
@@ -50,6 +51,16 @@ Unlike global travel apps, DesiTrip is engineered for the Bangladeshi ecosystem:
 ### 📶 Built for the Trail (Offline-First)
 - **Resilient Dashboard**: Your recent groups, expense summaries, and summaries are cached on-device for 100% usability without cellular coverage.
 - **Offline Actions**: Queue new expenses and view itineraries even in deep-forest or high-altitude zones.
+
+### 🏆 Gamification & Explorer Prestige
+- **Badge Collection**: Earn unique achievement badges based on your destinations (e.g., *Beach King* for Cox's Bazar, *Cloud Chaser* for Sajek).
+- **Prestige Milestones**: Tiered rewards for frequent travelers, from *Rising Traveler* (5 tours) up to *National Legend* (20 tours).
+- **XP System**: Global experience points system that tracks your journey across Bangladesh and adds a layer of competitive prestige to your profile.
+
+### 👤 Profile & Social Identity
+- **Personalized Showcase**: Dedicated profile page displaying your badge trophy room, total XP, and personalized travel bio.
+- **Identity Sync**: Custom avatars (powered by Cloudinary) and display names that stay consistent across the Community Feed.
+- **Community Stories**: Share your journeys and hidden gems with the community. Posts and comments now feature real-time integrated user avatars.
 
 ### 🛡️ Safety & SOS Alerts
 - **Hold-to-Trigger SOS**: A high-stakes 3-second hold mechanism to prevent accidental emergency signals.
@@ -63,13 +74,33 @@ Unlike global travel apps, DesiTrip is engineered for the Bangladeshi ecosystem:
 
 ---
 
+## 🛠️ The "Devpost Secret Sauce" (Technical Edge)
+
+### 🔄 Sync Conflict & Concurrency Management
+In a squad environment, two users might log expenses offline simultaneously. DeshiTrip utilizes a **Last-Write-Wins (LWW) with Version Tracking** strategy.
+- **Outbox Sequencing**: Every offline action is timestamped and assigned a client-side UUID.
+- **Atomic Merging**: When connectivity returns, the backend processes reconcile the outbox vs the current server state, ensuring that balance calculations remain accurate even with hundreds of concurrent offline updates.
+
+### 🎮 The Retention Engine (Business Viability)
+DeshiTrip isn't a "one-off" utility; it's a social travel platform.
+- **XP Ecosystem**: Every tour, badge, and community interaction builds a permanent prestige score.
+- **Prestige Milestones**: By rewarding long-term progression (e.g., *National Legend* at 20 tours), we encourage users to keep the app installed for years, not just for a single weekend trip. This high retention logic is key for true platform scalability.
+
+### ⚙️ Overcoming Technical Challenges
+**Challenge**: Guaranteeing SOS voice delivery in 2G/Low-Bandwidth zones (common in the Hill Tracts).
+**Solution**: We implemented a **Heartbeat-Monitor & Chunked Buffer** system. If a socket connection flickers, the app buffers the voice recordings locally and re-attempts broadcast using a prioritized message-queue. This ensures that a life-saving SOS alert never gets "dropped" due to a spotty 4G signal.
+
+---
+
 ## 🛠️ Technical Notes & API Integrations
 
 ### 🧠 Intelligence Suite
-- **Google Gemini 1.5 Pro**: Orchestrates the AI Planner. We utilize specialized system prompts to enforce **locale-aware generation** (Bengali responses with English JSON keys) and enforce budget-friendly traveling constraints specific to the Bangladeshi economy.
+- **Google Gemini 2,5-Flash**: Orchestrates the AI Planner and **Smart OCR Scanner**. We utilize specialized system prompts to enforce **locale-aware generation** (Bengali responses with English JSON keys) and multi-modal vision to parse handwritten travel memos.
 - **OpenRouteService (ORS) API**: Handles real-time route calculations, distance estimation, and travel time for the "Spot Explore" feature.
 
-### 📡 Real-Time & Audio Engineering
+### 📡 Real-Time & Media Engineering
+- **Cloudinary Integration**: Handles optimized storage and delivery of high-resolution user avatars and trip memory photos.
+- **Social Synthesis (Tour Wrapped)**: Uses `html-to-image` to generate dynamic JPEGs from React components, paired with the **Web Share API** for native mobile story sharing.
 - **Socket.io Sync**: A robust bi-directional communication layer handles instant SOS alerts across sessions. Includes polling fallbacks and 10MB payload capacity for voice data.
 - **Web Audio API Fallback**: Uses square-wave oscillators to synthesize emergency distractors locally, bypassing browser autoplay restrictions and missing asset errors.
 - **MediaRecorder API**: Safely captures high-quality audio chunks across mobile and desktop browsers during emergency events.
@@ -98,13 +129,15 @@ Built using **TurboRepo** and **PNPM** workspaces for efficient scaling.
 -   **Styling**: Tailwind CSS, Framer Motion
 -   **State/Data**: React Query, React Hook Form, Zod
 -   **Maps**: Leaflet / React-Leaflet
+-   **Share/Media**: html-to-image, Web Share API
 -   **I18n**: next-intl
 -   **PWA**: next-pwa (@ducanh2912/next-pwa) with Workbox
 
 ### Backend (`apps/api`)
 -   **Runtime**: Node.js & Express.js
--   **AI Engine**: [Google Gemini Pro](https://ai.google.dev/)
+-   **AI Engine**: [Google Gemini Pro/Flash](https://ai.google.dev/) (Text & Vision)
 -   **Database**: MongoDB (Mongoose ODM)
+-   **Media Storage**: Cloudinary (via multer-storage-cloudinary)
 -   **Auth**: JWT & Argon2 hashing
 -   **API Security**: Helmet, CORS
 
@@ -183,7 +216,6 @@ Distributed under the MIT License.
 ## 🔮 What's Next?
 - **Ticketing Integration**: Real-time integration with Shohoz/GoZayaan APIs for direct bus and launch bookings.
 - **AR Guide**: Augmented Reality landmark scanning to provide historical context for heritage sites like Mahasthangarh or Ahsan Manzil.
-- **Community Rewards**: A gamified "Explorer Points" system for users who share detailed authentic stories.
 
 ---
 
