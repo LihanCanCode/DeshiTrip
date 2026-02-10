@@ -23,7 +23,7 @@ export const createBlog = async (req: AuthRequest, res: Response) => {
 
         const savedBlog = await blog.save();
         // Populate author immediately for frontend
-        await savedBlog.populate('author', 'name email');
+        await savedBlog.populate('author', 'name email avatar');
 
         res.status(201).json(savedBlog);
     } catch (error) {
@@ -43,8 +43,8 @@ export const getBlogs = async (req: Request, res: Response) => {
         }
 
         const blogs = await Blog.find(query)
-            .populate('author', 'name email')
-            .populate('comments.user', 'name')
+            .populate('author', 'name email avatar')
+            .populate('comments.user', 'name avatar')
             .sort({ createdAt: -1 }); // Newest first
 
         res.status(200).json(blogs);
@@ -101,7 +101,7 @@ export const commentBlog = async (req: AuthRequest, res: Response) => {
         await blog.save();
 
         // Populate specific fields to return updated blog
-        await blog.populate('comments.user', 'name');
+        await blog.populate('comments.user', 'name avatar');
 
         res.status(201).json(blog);
     } catch (error) {

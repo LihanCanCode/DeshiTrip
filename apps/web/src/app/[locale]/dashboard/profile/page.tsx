@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import api from '@/utils/api';
 import { cn } from '@/utils/cn';
+import { useRef } from 'react';
 
 export default function ProfilePage() {
     const t = useTranslations('Settings');
@@ -21,8 +22,12 @@ export default function ProfilePage() {
         xp: number;
         displayName: string;
         bio: string;
+        avatar?: string;
         badges: Array<{ name: string; icon: string; description: string; earnedAt: string }>
     } | null>(null);
+
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isUploading, setIsUploading] = useState(false);
 
     // Form States
     const [formData, setFormData] = useState({
@@ -66,6 +71,26 @@ export default function ProfilePage() {
         }
     };
 
+    const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setIsUploading(true);
+        const uploadData = new FormData();
+        uploadData.append('avatar', file);
+
+        try {
+            await api.post('/auth/upload-avatar', uploadData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            await fetchProfile();
+        } catch (err) {
+            console.error('Failed to upload avatar', err);
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
     const initials = user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').toUpperCase() : 'JD';
 
     return (
@@ -91,10 +116,30 @@ export default function ProfilePage() {
                 <div className="space-y-6">
                     <div className="glass p-8 rounded-[2.5rem] border-white/5 bg-white/[0.02] text-center">
                         <div className="relative inline-block group mb-6">
-                            <div className="w-32 h-32 bg-gradient-to-br from-emerald-600 to-teal-800 rounded-[2.5rem] flex items-center justify-center font-black text-4xl shadow-2xl shadow-emerald-500/20 mb-4 transition-transform group-hover:scale-105 duration-500">
-                                {initials}
+                            <div className="w-32 h-32 bg-gradient-to-br from-emerald-600 to-teal-800 rounded-[2.5rem] flex items-center justify-center font-black text-4xl shadow-2xl shadow-emerald-500/20 mb-4 transition-transform group-hover:scale-105 duration-500 overflow-hidden">
+                                {user?.avatar ? (
+                                    <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                                ) : (
+                                    initials
+                                )}
+                                {isUploading && (
+                                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                        <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+                                    </div>
+                                )}
                             </div>
-                            <button className="absolute bottom-4 right-0 p-3 bg-zinc-900 border border-white/10 rounded-2xl text-emerald-500 hover:text-white transition-colors shadow-2xl group-hover:scale-110">
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleAvatarUpload}
+                                className="hidden"
+                                accept="image/*"
+                            />
+                            <button
+                                onClick={() => fileInputRef.current?.click()}
+                                disabled={isUploading}
+                                className="absolute bottom-4 right-0 p-3 bg-zinc-900 border border-white/10 rounded-2xl text-emerald-500 hover:text-white transition-colors shadow-2xl group-hover:scale-110 disabled:opacity-50"
+                            >
                                 <Camera className="w-4 h-4" />
                             </button>
                         </div>

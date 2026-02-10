@@ -94,3 +94,26 @@ export const updateProfile = async (req: Request, res: Response) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+export const updateAvatar = async (req: Request, res: Response) => {
+    try {
+        const userId = (req as any).user.id;
+        if (!req.file) {
+            return res.status(400).json({ message: 'No file uploaded' });
+        }
+
+        const avatarUrl = (req.file as any).path; // Cloudinary URL
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        user.avatar = avatarUrl;
+        await user.save();
+
+        res.json({ message: 'Avatar updated successfully', avatar: avatarUrl });
+    } catch (error: any) {
+        res.status(500).json({ message: error.message });
+    }
+};

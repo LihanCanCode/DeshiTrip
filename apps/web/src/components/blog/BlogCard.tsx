@@ -7,14 +7,14 @@ import { Button } from "@/components/ui/Button";
 import axios from "axios";
 
 interface Comment {
-    user: { _id: string; name: string };
+    user: { _id: string; name: string; avatar?: string };
     text: string;
     createdAt: string;
 }
 
 interface Blog {
     _id: string;
-    author: { _id: string; name: string };
+    author: { _id: string; name: string; avatar?: string };
     content: string;
     spotName: string;
     likes: string[];
@@ -81,8 +81,12 @@ export const BlogCard = ({ blog, currentUserId }: BlogCardProps) => {
             {/* Header */}
             <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center font-bold text-white uppercase">
-                        {blog.author.name[0]}
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center font-bold text-white uppercase overflow-hidden">
+                        {blog.author.avatar ? (
+                            <img src={blog.author.avatar} alt={blog.author.name} className="w-full h-full object-cover" />
+                        ) : (
+                            blog.author.name[0]
+                        )}
                     </div>
                     <div>
                         <h4 className="font-bold text-white">{blog.author.name}</h4>
@@ -124,8 +128,12 @@ export const BlogCard = ({ blog, currentUserId }: BlogCardProps) => {
                 <div className="mt-6 pt-6 border-t border-white/5 space-y-4">
                     {comments.map((comment, i) => (
                         <div key={i} className="flex gap-3">
-                            <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-400 flex-shrink-0">
-                                {comment.user?.name?.[0] || 'U'}
+                            <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-400 flex-shrink-0 overflow-hidden">
+                                {comment.user?.avatar ? (
+                                    <img src={comment.user.avatar} alt={comment.user.name} className="w-full h-full object-cover" />
+                                ) : (
+                                    comment.user?.name?.[0] || 'U'
+                                )}
                             </div>
                             <div className="bg-zinc-800/50 rounded-2xl p-3 flex-1">
                                 <p className="text-xs font-bold text-zinc-400 mb-1">{comment.user?.name || 'User'}</p>
