@@ -5,7 +5,7 @@ import { emitToGroup } from '../services/socketService';
 
 export const triggerSOS = async (req: Request, res: Response) => {
     try {
-        const { location, message } = req.body;
+        const { location, message, voiceData } = req.body;
         const userId = (req as any).user?.id;
 
         if (!location || !location.coordinates) {
@@ -28,6 +28,7 @@ export const triggerSOS = async (req: Request, res: Response) => {
             groups: groupIds,
             location,
             message,
+            voiceData,
             status: 'active'
         });
 
@@ -43,6 +44,7 @@ export const triggerSOS = async (req: Request, res: Response) => {
                 user: populatedAlert?.user,
                 location: populatedAlert?.location,
                 message: populatedAlert?.message,
+                voiceData: populatedAlert?.voiceData,
                 timestamp: populatedAlert?.createdAt
             });
         });

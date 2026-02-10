@@ -18,11 +18,15 @@ interface IncomingAlert {
         coordinates: [number, number];
     };
     message: string;
+    voiceData?: string;
     timestamp: string;
 }
 
 export const SOSAlertOverlay = () => {
     const [activeAlert, setActiveAlert] = useState<IncomingAlert | null>(null);
+    const [isPlayingVoice, setIsPlayingVoice] = useState(false);
+    const [voiceAudio, setVoiceAudio] = useState<HTMLAudioElement | null>(null);
+    const [isMuted, setIsMuted] = useState(true);
 
     useEffect(() => {
         // Connect socket if not already
@@ -45,9 +49,48 @@ export const SOSAlertOverlay = () => {
             }
 
             setActiveAlert(data);
-            // Play a sound if possible (audio context might be blocked initially)
-            const audio = new Audio('/emergency-alert.mp3');
-            audio.play().catch(e => console.log("Audio play blocked"));
+
+            // Synthesize an alert sound (works without a file)
+            playEmergencyBeep();
+
+            // Auto-play voice message if present
+            if (data.voiceData) {
+                setTimeout(() => {
+                    playVoice(data.voiceData!);
+                }, 1500);
+            }
+        };
+
+        const playEmergencyBeep = () => {
+            try {
+                const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                oscillator.type = 'square';
+                oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
+
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1);
+
+                oscillator.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + 1);
+            } catch (err) {
+                console.warn("Audio synthesis blocked/failed", err);
+            }
+        };
+
+        const playVoice = (base64: string) => {
+            if (voiceAudio) voiceAudio.pause();
+            const audio = new Audio(base64);
+            audio.onplay = () => setIsPlayingVoice(true);
+            audio.onended = () => setIsPlayingVoice(false);
+            audio.onpause = () => setIsPlayingVoice(false);
+            setVoiceAudio(audio);
+            audio.play().catch(e => console.log("Voice play blocked"));
         };
 
         const handleResolve = (data: { alertId: string }) => {
@@ -107,10 +150,45 @@ export const SOSAlertOverlay = () => {
                             </div>
                         </div>
 
-                        <div className="bg-white/5 p-6 rounded-[2rem] border border-white/5">
+                        <div className="bg-white/5 p-6 rounded-[2rem] border border-white/5 space-y-4">
                             <p className="text-zinc-300 italic text-lg font-medium leading-relaxed">
                                 "{activeAlert.message}"
                             </p>
+
+                            {activeAlert.voiceData && (
+                                <div className="pt-2">
+                                    <Button
+                                        onClick={() => {
+                                            if (isPlayingVoice) {
+                                                voiceAudio?.pause();
+                                            } else {
+                                                const audio = new Audio(activeAlert.voiceData);
+                                                audio.onplay = () => setIsPlayingVoice(true);
+                                                audio.onended = () => setIsPlayingVoice(false);
+                                                audio.onpause = () => setIsPlayingVoice(false);
+                                                setVoiceAudio(audio);
+                                                audio.play();
+                                            }
+                                        }}
+                                        className={`w-full ${isPlayingVoice ? 'bg-red-600' : 'bg-emerald-600'} hover:opacity-90 rounded-xl h-12 flex items-center justify-center gap-2 transition-colors`}
+                                    >
+                                        <div className="flex gap-1 items-center">
+                                            {isPlayingVoice ? (
+                                                <>
+                                                    <span className="w-1 h-3 bg-white animate-bounce" />
+                                                    <span className="w-1 h-5 bg-white animate-bounce [animation-delay:0.2s]" />
+                                                    <span className="w-1 h-3 bg-white animate-bounce [animation-delay:0.4s]" />
+                                                </>
+                                            ) : (
+                                                <ShieldAlert className="w-5 h-5" />
+                                            )}
+                                        </div>
+                                        <span className="font-black uppercase tracking-widest text-[10px]">
+                                            {isPlayingVoice ? 'Playing Voice Message...' : 'Play Voice Message'}
+                                        </span>
+                                    </Button>
+                                </div>
+                            )}
                         </div>
 
                         <div className="flex flex-col gap-3 pt-2">

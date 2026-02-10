@@ -8,6 +8,7 @@ export interface IAlert extends Document {
         coordinates: [number, number]; // [longitude, latitude]
     };
     message?: string;
+    voiceData?: string; // Base64 audio data
     status: 'active' | 'resolved';
     createdAt: Date;
     updatedAt: Date;
@@ -21,6 +22,7 @@ const AlertSchema: Schema = new Schema({
         coordinates: { type: [Number], required: true },
     },
     message: { type: String },
+    voiceData: { type: String },
     status: { type: String, enum: ['active', 'resolved'], default: 'active' },
 }, {
     timestamps: true
