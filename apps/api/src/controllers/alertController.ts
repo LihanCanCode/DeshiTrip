@@ -41,7 +41,11 @@ export const triggerSOS = async (req: Request, res: Response) => {
         groupIds.forEach((groupId: any) => {
             emitToGroup(groupId.toString(), 'sos_alert', {
                 alertId: populatedAlert?._id,
-                user: populatedAlert?.user,
+                user: {
+                    id: (populatedAlert?.user as any)?._id,
+                    name: (populatedAlert?.user as any)?.name,
+                    email: (populatedAlert?.user as any)?.email
+                },
                 location: populatedAlert?.location,
                 message: populatedAlert?.message,
                 voiceData: populatedAlert?.voiceData,
@@ -85,7 +89,7 @@ export const resolveAlert = async (req: Request, res: Response) => {
 
 export const getActiveAlerts = async (req: Request, res: Response) => {
     try {
-        const userId = (req as any).user?._id;
+        const userId = (req as any).user?.id;
 
         // Find active alerts in groups where I am a member
         const myGroups = await Group.find({

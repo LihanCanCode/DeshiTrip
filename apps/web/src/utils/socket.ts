@@ -8,6 +8,7 @@ const getSocketURL = () => {
 
 const socket = io(getSocketURL(), {
     autoConnect: false,
+    transports: ['polling', 'websocket'], // Polling first for better compatibility, then upgrade
 });
 
 export default socket;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertCircle, X, ShieldAlert, Loader2 } from "lucide-react";
 import api from "@/utils/api";
@@ -13,8 +13,8 @@ export const SOSButton = () => {
     const [recordingTime, setRecordingTime] = useState(10);
     const [isTriggering, setIsTriggering] = useState(false);
     const [lastAlert, setLastAlert] = useState<any>(null);
-    const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
-    const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const chunksRef = useRef<Blob[]>([]);
 
     useEffect(() => {
         let interval: NodeJS.Timeout;
@@ -49,21 +49,17 @@ export const SOSButton = () => {
         setIsHolding(false);
         setIsRecording(true);
         setRecordingTime(10);
+        chunksRef.current = [];
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             const recorder = new MediaRecorder(stream);
-            const chunks: Blob[] = [];
 
             recorder.ondataavailable = (e) => {
-                if (e.data.size > 0) chunks.push(e.data);
-            };
-
-            recorder.onstop = () => {
-                setAudioChunks(chunks);
+                if (e.data.size > 0) chunksRef.current.push(e.data);
             };
 
             recorder.start();
-            setMediaRecorder(recorder);
+            mediaRecorderRef.current = recorder;
         } catch (err) {
             console.error("Microphone access denied:", err);
             setIsRecording(false);
@@ -75,70 +71,81 @@ export const SOSButton = () => {
         setIsRecording(false);
         setIsTriggering(true);
 
+        console.log("[SOS] Finishing recording...");
         let voiceBase64 = "";
 
         // Stop recording and get base64
-        if (mediaRecorder && mediaRecorder.state !== "inactive") {
-            const audioPromise = new Promise<string>((resolve) => {
-                mediaRecorder.onstop = () => {
-                    // Collect all chunks accumulated so far
-                    const blob = new Blob(audioChunks, { type: 'audio/webm' });
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                        resolve(reader.result as string);
+        const recorder = mediaRecorderRef.current;
+        if (recorder && recorder.state !== "inactive") {
+            try {
+                const audioPromise = new Promise<string>((resolve) => {
+                    recorder.onstop = () => {
+                        const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result as string);
+                        reader.readAsDataURL(blob);
                     };
-                    reader.readAsDataURL(blob);
-                };
-                mediaRecorder.stop();
-                mediaRecorder.stream.getTracks().forEach(track => track.stop());
-            });
-            voiceBase64 = await audioPromise;
+                    recorder.stop();
+                    recorder.stream.getTracks().forEach(track => track.stop());
+                });
+                voiceBase64 = await audioPromise;
+            } catch (err) {
+                console.error("[SOS] Recording stop failed:", err);
+            }
         }
 
         try {
+            console.log("[SOS] Capturing location...");
             const position = await new Promise<GeolocationPosition>((resolve, reject) => {
                 navigator.geolocation.getCurrentPosition(resolve, reject, {
                     enableHighAccuracy: true,
-                    timeout: 5000,
+                    timeout: 8000,
                     maximumAge: 0
                 });
             });
 
             const { longitude, latitude } = position.coords;
+            console.log("[SOS] Location captured:", longitude, latitude);
 
-            const response = await api.post('/alerts/sos', {
+            const payload = {
                 location: {
                     type: 'Point',
                     coordinates: [longitude, latitude]
                 },
                 message: "Emergency SOS triggered! Please help.",
                 voiceData: voiceBase64
-            });
+            };
+
+            console.log("[SOS] Sending alert to backend...");
+            const response = await api.post('/alerts/sos', payload);
 
             setLastAlert(response.data.alert);
+            console.log("[SOS] Success!", response.data);
             alert("SOS Alert Sent! Your group members have been notified.");
         } catch (error: any) {
             console.error("SOS Failed:", error);
-            alert(error.message || "Failed to trigger SOS.");
+            const errorMsg = error.response?.data?.message || error.message || "Unknown error";
+            alert(`SOS Failed: ${errorMsg}\n\nCheck if you have enabled Location and Microphone permissions.`);
         } finally {
             setIsTriggering(false);
             setRecordingTime(10);
-            setMediaRecorder(null);
-            setAudioChunks([]);
+            mediaRecorderRef.current = null;
+            chunksRef.current = [];
         }
     };
 
     const cancelSOS = () => {
-        if (mediaRecorder && mediaRecorder.state !== "inactive") {
-            mediaRecorder.stop();
-            mediaRecorder.stream.getTracks().forEach(track => track.stop());
+        const recorder = mediaRecorderRef.current;
+        if (recorder && recorder.state !== "inactive") {
+            recorder.stop();
+            recorder.stream.getTracks().forEach(track => track.stop());
         }
         setIsRecording(false);
         setIsHolding(false);
         setHoldProgress(0);
         setRecordingTime(10);
-        setMediaRecorder(null);
-        setAudioChunks([]);
+        mediaRecorderRef.current = null;
+        chunksRef.current = [];
     };
 
     return (

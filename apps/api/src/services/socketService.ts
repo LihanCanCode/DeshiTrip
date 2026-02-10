@@ -9,6 +9,7 @@ export const initSocket = (server: HTTPServer) => {
             origin: '*', // In production, restrict this to your frontend URL
             methods: ['GET', 'POST'],
         },
+        maxHttpBufferSize: 1e7, // 10MB to match express limit
     });
 
     console.log('[socket]: Socket.io initialized');
