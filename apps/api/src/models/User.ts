@@ -7,6 +7,8 @@ export interface IUser extends Document {
     avatar?: string;
     role: 'user' | 'admin';
     xp: number;
+    bio?: string;
+    displayName?: string;
     badges: {
         name: string;
         icon: string;
@@ -26,6 +28,8 @@ const userSchema = new Schema<IUser>(
         avatar: { type: String },
         role: { type: String, enum: ['user', 'admin'], default: 'user' },
         xp: { type: Number, default: 0 },
+        bio: { type: String, default: '' },
+        displayName: { type: String, default: '' },
         badges: [
             {
                 name: { type: String, required: true },

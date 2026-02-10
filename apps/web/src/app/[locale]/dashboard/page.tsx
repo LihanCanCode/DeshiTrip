@@ -17,6 +17,7 @@ import api from '@/utils/api';
 
 const groupSchema = z.object({
     name: z.string().min(3, 'Group name must be at least 3 characters'),
+    destination: z.string().min(2, 'Destination must be at least 2 characters'),
     description: z.string().optional(),
 });
 
@@ -28,6 +29,7 @@ interface Group {
     members: any[];
     guests: any[];
     inviteCode: string;
+    destination: string;
 }
 
 export default function DashboardPage() {
@@ -178,6 +180,10 @@ export default function DashboardPage() {
                                             </div>
                                             <div className="min-w-0">
                                                 <h3 className="text-lg md:text-xl font-bold group-hover:text-emerald-400 transition-colors uppercase tracking-tight truncate">{group.name}</h3>
+                                                <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-1">
+                                                    <MapPin className="w-3 h-3 text-emerald-500" />
+                                                    {group.destination || 'Unset'}
+                                                </div>
                                                 <div className="flex items-center gap-3 md:gap-4 text-[10px] font-black uppercase tracking-widest text-zinc-600">
                                                     <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> {(group.members?.length || 0) + (group.guests?.length || 0)} members</span>
                                                     <span className="sm:inline-flex hidden items-center gap-1.5 px-2 py-0.5 bg-white/5 rounded-full">Code: {group.inviteCode}</span>
@@ -243,6 +249,20 @@ export default function DashboardPage() {
                         {errors.name && (
                             <p className="flex items-center gap-1.5 text-xs text-red-500 ml-1">
                                 <AlertCircle className="w-3 h-3" /> {errors.name.message}
+                            </p>
+                        )}
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Destination</label>
+                        <Input
+                            placeholder="e.g. Sajek Valley, Rangamati"
+                            className={errors.destination ? 'border-red-500/50 bg-red-500/5 h-16 rounded-2xl' : 'h-16 rounded-2xl'}
+                            {...register('destination')}
+                        />
+                        {errors.destination && (
+                            <p className="flex items-center gap-1.5 text-xs text-red-500 ml-1">
+                                <AlertCircle className="w-3 h-3" /> {errors.destination.message}
                             </p>
                         )}
                     </div>

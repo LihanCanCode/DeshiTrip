@@ -57,6 +57,7 @@ interface Group {
     foodieStat?: string;
     status: 'active' | 'finished';
     inviteCode: string;
+    destination: string;
     admin: string;
 }
 

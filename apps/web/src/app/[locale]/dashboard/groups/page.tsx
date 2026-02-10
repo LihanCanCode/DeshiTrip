@@ -17,6 +17,7 @@ import { isOnline, saveToCache, getFromCache, addToOutbox, getOutbox, removeFrom
 
 const groupSchema = z.object({
     name: z.string().min(3, 'Group name must be at least 3 characters'),
+    destination: z.string().min(2, 'Destination must be at least 2 characters'),
     description: z.string().optional(),
 });
 
@@ -34,6 +35,7 @@ interface Group {
     members: string[];
     guests: { name: string; addedBy: string }[];
     inviteCode: string;
+    destination: string;
     status: 'Upcoming' | 'Planning' | 'Completed';
     role: 'Admin' | 'Member';
     admin: unknown;
@@ -188,6 +190,7 @@ export default function GroupsPage() {
             const optimisticGroup: Group = {
                 _id: 'temp-' + Date.now(),
                 name: data.name,
+                destination: data.destination,
                 description: data.description || '',
                 members: [],
                 guests: guests.map(g => ({ name: g, addedBy: 'me' })),
@@ -309,10 +312,14 @@ export default function GroupsPage() {
                                 </div>
                             </div>
 
-                            <div className="space-y-1 mb-8">
-                                <h3 className="text-2xl font-bold group-hover:text-emerald-400 transition-colors">{group.name}</h3>
-                                <p className="text-zinc-500 text-sm line-clamp-2">{group.description}</p>
+                            <div className="space-y-1 mb-6">
+                                <h3 className="text-2xl font-bold group-hover:text-emerald-400 transition-colors uppercase tracking-tight">{group.name}</h3>
+                                <div className="flex items-center gap-1.5 text-zinc-500 font-bold text-[10px] uppercase tracking-widest bg-white/5 w-fit px-3 py-1 rounded-full border border-white/5">
+                                    <MapPin className="w-3 h-3 text-emerald-500" />
+                                    {group.destination || 'Unset'}
+                                </div>
                             </div>
+                            <p className="text-zinc-500 text-sm line-clamp-2 mb-8">{group.description}</p>
 
                             <div className="flex items-center justify-between pt-8 border-t border-white/5">
                                 <div className="flex items-center gap-6 text-sm text-zinc-400">
@@ -347,6 +354,17 @@ export default function GroupsPage() {
                         />
                         {createForm.formState.errors.name && (
                             <p className="text-xs text-red-500 ml-1">{createForm.formState.errors.name.message}</p>
+                        )}
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-zinc-400 ml-1">{t('createGroupModal.destination')}</label>
+                        <Input
+                            placeholder={t('createGroupModal.placeholderDestination')}
+                            {...createForm.register('destination')}
+                        />
+                        {createForm.formState.errors.destination && (
+                            <p className="text-xs text-red-500 ml-1">{createForm.formState.errors.destination.message}</p>
                         )}
                     </div>
 

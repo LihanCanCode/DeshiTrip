@@ -17,6 +17,7 @@ export interface IGroup extends Document {
     foodieStat?: string;
     status: 'active' | 'finished';
     finishedAt?: Date;
+    destination: string;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -41,6 +42,7 @@ const groupSchema = new Schema<IGroup>(
         foodieStat: { type: String, default: '' },
         status: { type: String, enum: ['active', 'finished'], default: 'active' },
         finishedAt: { type: Date },
+        destination: { type: String, default: '' },
     },
     { timestamps: true }
 );

@@ -5,12 +5,13 @@ import { v4 as uuidv4 } from 'uuid';
 
 export const createGroup = async (req: Request, res: Response) => {
     try {
-        const { name, description, guests } = req.body;
+        const { name, description, guests, destination } = req.body;
         const adminId = (req as any).user.id;
 
         const group = new Group({
             name,
             description,
+            destination: destination || '',
             admin: adminId,
             members: [adminId],
             guests: guests ? guests.map((g: string) => ({ name: g, addedBy: adminId })) : [],

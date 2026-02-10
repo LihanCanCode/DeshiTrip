@@ -149,6 +149,8 @@
             "title": "Create New Group",
             "groupName": "Group Name",
             "placeholderName": "e.g. Dream Sylhet Tour",
+            "destination": "Destination",
+            "placeholderDestination": "e.g. Sylhet, Sajek, or Cox's Bazar",
             "description": "Description",
             "placeholderDesc": "Short description of your trip...",
             "addMembers": "Add Members (Optional)",
