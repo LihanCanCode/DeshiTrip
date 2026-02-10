@@ -8,7 +8,7 @@ import { Sparkles, Filter, Search } from "lucide-react";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 import { spotsData } from "@/data/spotsData";
 import { SpotDetailModal } from "@/components/SpotDetailModal";
@@ -19,6 +19,7 @@ const curatedSpots = spotsData;
 export default function RecommendPage() {
     const t = useTranslations('Spots');
     const params = useParams();
+    const router = useRouter();
     const locale = (params.locale as string) || 'en';
     const currentLocale = locale as 'en' | 'bn';
 
@@ -263,16 +264,17 @@ export default function RecommendPage() {
                                                 {loadingRoute && !currentRouteData ? t('calculatingRoute') : t('viewingRoute')} <span className="animate-pulse">●</span>
                                             </div>
 
-                                            {'tourPlan' in spot && (
+                                            {(('tourPlan' in spot) || spot.isSearchResult) && (
                                                 <Button
-                                                    className="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-bold rounded-xl"
+                                                    className="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-bold rounded-xl flex items-center justify-center gap-2"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        setSelectedSpot(spot);
-                                                        setIsModalOpen(true);
+                                                        const destination = spot.name[currentLocale] || spot.name.en;
+                                                        router.push(`/${locale}/dashboard/ai-planner?to=${encodeURIComponent(destination)}`);
                                                     }}
                                                 >
-                                                    {t('viewTourPlan')}
+                                                    <Sparkles className="w-4 h-4" />
+                                                    {t('planWithAI')}
                                                 </Button>
                                             )}
                                         </div>

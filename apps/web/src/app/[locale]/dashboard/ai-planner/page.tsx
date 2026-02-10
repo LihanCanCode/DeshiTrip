@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, MapPin, Calendar, Users, Loader2, ChevronDown, DollarSign, Clock, Utensils, Hotel, CheckCircle2 } from "lucide-react";
-import { useParams } from "next/navigation";
+import { Sparkles, MapPin, Calendar, Users, Loader2, ChevronDown, DollarSign, Clock, Utensils, Hotel, CheckCircle2, Map as MapIcon } from "lucide-react";
+import { useParams, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import api from "@/utils/api";
+
 
 interface TripPlan {
     tripOverview: {
@@ -53,10 +54,16 @@ interface TripPlan {
     }>;
     essentialTips: string[];
     packingList: string[];
+    locations?: Array<{
+        day: number;
+        name: string;
+        type: string;
+    }>;
 }
 
 export default function AIPlannerPage() {
     const params = useParams();
+    const searchParams = useSearchParams();
     const [from, setFrom] = useState("");
     const [to, setTo] = useState("");
     const [days, setDays] = useState(3);
@@ -66,6 +73,15 @@ export default function AIPlannerPage() {
     const [tripPlan, setTripPlan] = useState<TripPlan | null>(null);
     const [expandedDay, setExpandedDay] = useState<number | null>(null);
     const t = useTranslations('AIPlanner');
+
+    // Pre-fill destination from URL query parameter
+    useEffect(() => {
+        const toParam = searchParams.get('to');
+        if (toParam) {
+            setTo(decodeURIComponent(toParam));
+        }
+    }, [searchParams]);
+
 
     const handleGenerate = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -270,6 +286,7 @@ export default function AIPlannerPage() {
                         </div>
                     </div>
 
+
                     {/* Itinerary */}
                     <div className="space-y-4">
                         <h3 className="text-xl font-bold text-white flex items-center gap-3">
@@ -418,7 +435,8 @@ export default function AIPlannerPage() {
                         </div>
                     </div>
                 </motion.div>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 }

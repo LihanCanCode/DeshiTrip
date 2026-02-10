@@ -155,7 +155,14 @@ Provide a comprehensive tour plan in the following JSON format (respond with ONL
   "localContacts": {
     "emergencyNumbers": ["999 - Emergency", "333 - Fire Service"],
     "touristPolice": "Number if applicable"
-  }
+  },
+  "locations": [
+    {
+      "day": 1,
+      "name": "Exact location name (use official spot name)",
+      "type": "destination"
+    }
+  ]
 }
 
 IMPORTANT REQUIREMENTS:
@@ -188,7 +195,8 @@ IMPORTANT REQUIREMENTS:
 15. **For food prices, give a RANGE (e.g., 150 - 500 BDT).**
 16. **Duration format MUST be exactly '${days} Days, ${nights} Nights'**
 17. **Include a distinct list of 'Must Try Food' items with costs.**
-18. **LANGUAGE REQUIREMENT**: ${locale === 'bn' ? 'Provide all titles, descriptions, food names, and tips in **Bengali**, but keep the JSON keys (keys only!) exactly as defined above in English.' : 'Provide everything in English.'}
+18. **LOCATION MAPPING REQUIREMENT**: Include a 'locations' array with each day's PRIMARY destination for route mapping. Use exact, official location names (e.g., "Cox's Bazar", "Inani Beach", "Sylhet").
+19. **LANGUAGE REQUIREMENT**: ${locale === 'bn' ? 'Provide all titles, descriptions, food names, and tips in **Bengali**, but keep the JSON keys (keys only!) exactly as defined above in English.' : 'Provide everything in English.'}
 
 Create a memorable and **wallet-friendly** trip plan!`;
 

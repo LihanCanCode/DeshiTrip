@@ -175,11 +175,11 @@
         "drive": "drive",
         "calculatingRoute": "Calculating Route...",
         "viewingRoute": "Viewing Route",
-        "viewTourPlan": "View Tour Plan & Cost",
+        "planWithAI": "Plan with AI",
         "nature": "Nature",
         "budgetFriendly": "Budget Friendly",
         "proTip": "Pro Tip",
-        "proTipDesc": "Click \"View Tour Plan\" on any top destination to see detailed transport options and budget estimates!",
+        "proTipDesc": "Click \"Plan with AI\" on any top destination to automatically start a detailed tour plan!",
         "modal": {
             "planFor": "Plan for {name}",
             "howToGo": "How to Go",
