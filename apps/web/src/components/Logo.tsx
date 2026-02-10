@@ -1,4 +1,4 @@
-import { Plane } from "lucide-react";
+import Image from "next/image";
 import { cn } from "@/utils/cn";
 import { useTranslations } from 'next-intl';
 
@@ -13,9 +13,13 @@ export const Logo = ({ className, showText = true }: LogoProps) => {
         <div className={cn("flex items-center gap-2", className)}>
             <div className="relative">
                 <div className="absolute inset-0 bg-emerald-500 blur-lg opacity-40 animate-pulse" />
-                <div className="relative bg-emerald-600 p-2 rounded-xl">
-                    <Plane className="w-6 h-6 text-white transform -rotate-12" />
-                </div>
+                <Image
+                    src="/icons/logo.png"
+                    alt="DesiTrip Logo"
+                    width={32}
+                    height={32}
+                    className="relative w-8 h-8 object-contain rounded-lg shadow-lg"
+                />
             </div>
             {showText && (
                 <span className="text-xl font-bold tracking-tight">

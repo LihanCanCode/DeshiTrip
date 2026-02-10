@@ -10,9 +10,12 @@ DesiTrip is a bilingual travel companion that keeps tour squads organised, uncov
 
 **[Live Demo: deshi-trip.vercel.app](https://deshi-trip.vercel.app)**
 
+> [!TIP]
+> **The "Wow" Moment**: Switch the app to Bengali and use the AI Planner to see real-time localized intelligence.
+
 ---
 
-## � The Pitch
+## 💡 The Pitch
 
 ### 📍 The Problem
 Tourists in Bangladesh face three major hurdles: **Information Fragmentation**, **Connectivity Gaps** in remote spots (like the Hill Tracts or Sundarbans), and **Language Barriers** when using generic global travel tools that don't understand local nuances or the Bengali language.
@@ -25,7 +28,14 @@ We built DesiTrip as a **Monorepo** powerhouse to ensure high-speed development 
 
 ---
 
-## �🚀 Features
+## 💎 Regional Edge
+Unlike global travel apps, DesiTrip is engineered for the Bangladeshi ecosystem:
+- **Local Economy Logic**: The AI doesn't just suggest "cheap" hotels; it understands the price delta between a Non-AC bus and a Green Line Scania, or the seasonal cost of a boat in the Sundarbans.
+- **Bengali-First Intelligence**: Our LLM implementation handles code-switching (Bengali/English) fluently, making it accessible to both urban Gen-Z and local guides.
+
+---
+
+## 🚀 Features
 
 ### 🤖 AI-Powered Trip Intelligence
 - **Dynamic Itinerary Generator**: Custom, budget-optimized travel plans across 64 districts of Bangladesh, powered by Google Gemini.
@@ -45,6 +55,27 @@ We built DesiTrip as a **Monorepo** powerhouse to ensure high-speed development 
 - **Enterprise-Grade Auth**: Secure login via JWT, Argon2 password hashing, and protected API middleware.
 - **Native Experience**: Full localization support for English (en) and Bengali (bn). The AI planner intelligently responds in your preferred language.
 
+---
+
+## 🛠️ Technical Notes & API Integrations
+
+### 🧠 Intelligence Suite
+- **Google Gemini 1.5 Pro**: Orchestrates the AI Planner. We utilize specialized system prompts to enforce **locale-aware generation** (Bengali responses with English JSON keys) and enforce budget-friendly traveling constraints specific to the Bangladeshi economy.
+- **OpenRouteService (ORS) API**: Handles real-time route calculations, distance estimation, and travel time for the "Spot Explore" feature.
+
+### 🌐 Internationalization (i18n) Strategy
+- Built with **next-intl**, the app maintains a unified locale state across the client, server, and AI requests. 
+- **Dynamic AI Localization**: Unlike standard translation, our AI engine dynamically shifts its entire persona and language output based on the user's selected locale.
+
+### 🔌 API Architecture
+- **Centralized Axios Interceptor**: Implemented in `@/utils/api.ts` to provide seamless, unified communication between the Vercel-hosted frontend and the Render-hosted backend.
+- **Auto-Auth Injection**: Automatically attaches JWT Bearer tokens to every outgoing request, ensuring consistent security without manual header management in components.
+
+### 🌩️ Offline & PWA Engineering
+- **Workbox Power**: Uses `next-pwa` with a custom **Cache-First** strategy for core UI assets and **Stale-While-Revalidate** for dynamic discovery data.
+- **Sync Engine**: We implemented an **Optimistic UI pattern**. When a user logs an expense in a "dead zone," the app updates the UI instantly and queues the API request in an IndexedDB-backed outbox. The Service Worker then monitors the sync event to flush the queue once connectivity is restored.
+- **Client-Side Vault**: Critical travel data (squad info, itinerary) is persisted on-device, allowing the app to remain functional in zero-connectivity zones like the Sundarbans.
+
 ## 🛠️ Tech Stack
 
 ### Monorepo Structure
@@ -55,9 +86,9 @@ Built using **TurboRepo** and **PNPM** workspaces for efficient scaling.
 -   **Language**: TypeScript
 -   **Styling**: Tailwind CSS, Framer Motion
 -   **State/Data**: React Query, React Hook Form, Zod
--   **Maps**: Mapbox GL / React Map GL
+-   **Maps**: Leaflet / React-Leaflet
 -   **I18n**: next-intl
--   **PWA**: next-pwa with Workbox for caching and offline fallbacks
+-   **PWA**: next-pwa (@ducanh2912/next-pwa) with Workbox
 
 ### Backend (`apps/api`)
 -   **Runtime**: Node.js & Express.js
@@ -65,7 +96,6 @@ Built using **TurboRepo** and **PNPM** workspaces for efficient scaling.
 -   **Database**: MongoDB (Mongoose ODM)
 -   **Auth**: JWT & Argon2 hashing
 -   **API Security**: Helmet, CORS
--   **Documentation**: Swagger/OpenAPI (prepared)
 
 ---
 
@@ -109,27 +139,9 @@ pnpm dev
 
 ---
 
-## �️ Technical Notes & API Integrations
-
-### 🧠 Intelligence Suite
-- **Google Gemini 1.5 Pro**: Orchestrates the AI Planner. We utilize specialized system prompts to enforce **locale-aware generation** (Bengali responses with English JSON keys) and enforce budget-friendly traveling constraints specific to the Bangladeshi economy.
-- **OpenRouteService (ORS) API**: Handles real-time route calculations, distance estimation, and travel time for the "Spot Explore" feature.
-
-### 🌐 Internationalization (i18n) Strategy
-- Built with **next-intl**, the app maintains a unified locale state across the client, server, and AI requests. 
-- **Dynamic AI Localization**: Unlike standard translation, our AI engine dynamically shifts its entire persona and language output based on the user's selected locale.
-
-### 🔌 API Architecture
-- **Centralized Axios Interceptor**: Implemented in `@/utils/api.ts` to provide seamless, unified communication between the Vercel-hosted frontend and the Render-hosted backend.
-- **Auto-Auth Injection**: Automatically attaches JWT Bearer tokens to every outgoing request, ensuring consistent security without manual header management in components.
-
-### 🌩️ Offline & PWA Engineering
-- **Workbox Power**: Uses `next-pwa` with a custom **Cache-First** strategy for core UI assets and **Stale-While-Revalidate** for dynamic discovery data.
-- **Client-Side Vault**: Critical travel data (squad info, itinerary) is persisted on-device, allowing the app to remain functional in zero-connectivity zones like the Sundarbans.
-
 ---
 
-## �📂 Project Structure
+## 📂 Project Structure
 
 ```
 ├── apps/
@@ -157,5 +169,11 @@ pnpm dev
 ## 📄 License
 Distributed under the MIT License.
 
+## 🔮 What's Next?
+- **Ticketing Integration**: Real-time integration with Shohoz/GoZayaan APIs for direct bus and launch bookings.
+- **AR Guide**: Augmented Reality landmark scanning to provide historical context for heritage sites like Mahasthangarh or Ahsan Manzil.
+- **Community Rewards**: A gamified "Explorer Points" system for users who share detailed authentic stories.
+
 ---
+
 *Built with ❤️ for Bangladesh Tourism*
