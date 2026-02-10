@@ -12,7 +12,20 @@ DesiTrip is a bilingual travel companion that keeps tour squads organised, uncov
 
 ---
 
-## 🚀 Features
+## � The Pitch
+
+### 📍 The Problem
+Tourists in Bangladesh face three major hurdles: **Information Fragmentation**, **Connectivity Gaps** in remote spots (like the Hill Tracts or Sundarbans), and **Language Barriers** when using generic global travel tools that don't understand local nuances or the Bengali language.
+
+### 🛠️ The Approach
+We built DesiTrip as a **Monorepo** powerhouse to ensure high-speed development and synchronized data models. By combining **Google Gemini's LLM capabilities** with a robust **Offline-First PWA architecture**, we created a tool that is both "Smart" and "Reliable" regardless of where the trail leads.
+
+### ✅ The Solution
+**DesiTrip** is a unified bilingual travel companion. It captures expenses offline, generates custom Bengali itineraries using AI, and provides a curated gateway to the 64 districts of Bangladesh—all while keeping your travel squad in sync.
+
+---
+
+## �🚀 Features
 
 ### 🤖 AI-Powered Trip Intelligence
 - **Dynamic Itinerary Generator**: Custom, budget-optimized travel plans across 64 districts of Bangladesh, powered by Google Gemini.
@@ -96,7 +109,27 @@ pnpm dev
 
 ---
 
-## 📂 Project Structure
+## �️ Technical Notes & API Integrations
+
+### 🧠 Intelligence Suite
+- **Google Gemini 1.5 Pro**: Orchestrates the AI Planner. We utilize specialized system prompts to enforce **locale-aware generation** (Bengali responses with English JSON keys) and enforce budget-friendly traveling constraints specific to the Bangladeshi economy.
+- **OpenRouteService (ORS) API**: Handles real-time route calculations, distance estimation, and travel time for the "Spot Explore" feature.
+
+### 🌐 Internationalization (i18n) Strategy
+- Built with **next-intl**, the app maintains a unified locale state across the client, server, and AI requests. 
+- **Dynamic AI Localization**: Unlike standard translation, our AI engine dynamically shifts its entire persona and language output based on the user's selected locale.
+
+### 🔌 API Architecture
+- **Centralized Axios Interceptor**: Implemented in `@/utils/api.ts` to provide seamless, unified communication between the Vercel-hosted frontend and the Render-hosted backend.
+- **Auto-Auth Injection**: Automatically attaches JWT Bearer tokens to every outgoing request, ensuring consistent security without manual header management in components.
+
+### 🌩️ Offline & PWA Engineering
+- **Workbox Power**: Uses `next-pwa` with a custom **Cache-First** strategy for core UI assets and **Stale-While-Revalidate** for dynamic discovery data.
+- **Client-Side Vault**: Critical travel data (squad info, itinerary) is persisted on-device, allowing the app to remain functional in zero-connectivity zones like the Sundarbans.
+
+---
+
+## �📂 Project Structure
 
 ```
 ├── apps/
