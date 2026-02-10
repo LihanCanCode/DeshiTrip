@@ -30,6 +30,19 @@ export const createExpense = async (req: Request, res: Response) => {
 
         await expense.save();
 
+        // Record Activity
+        const { createActivity } = require('./activityController');
+        const user = await User.findById(userId);
+        await createActivity({
+            group: groupId,
+            userId,
+            userName: payerGuestName || user?.name || 'Someone',
+            type: type === 'Settlement' ? 'SETTLEMENT_RECORDED' : 'EXPENSE_ADDED',
+            description: description,
+            amount: amount,
+            category: category
+        });
+
         const { emitToGroup } = require('../services/socketService');
         emitToGroup(groupId, 'group_updated', { type: 'EXPENSE_ADDED', expenseId: expense._id });
 

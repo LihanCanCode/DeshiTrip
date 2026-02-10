@@ -16,6 +16,7 @@ import expenseRoutes from './routes/expenseRoutes';
 import blogRoutes from './routes/blogRoutes';
 import uploadRoutes from './routes/uploadRoutes';
 import aiPlannerRoutes from './routes/aiPlannerRoutes';
+import activityRoutes from './routes/activityRoutes';
 
 const app: Application = express();
 const port = process.env.PORT || 8000;
@@ -34,6 +35,7 @@ app.use('/api/expenses', expenseRoutes);
 app.use('/api/blogs', blogRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/ai-planner', aiPlannerRoutes);
+app.use('/api/activities', activityRoutes);
 
 app.get('/health', (req: Request, res: Response) => {
     res.status(200).json({ status: 'OK', message: 'DeshiTrip API is running', db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected' });

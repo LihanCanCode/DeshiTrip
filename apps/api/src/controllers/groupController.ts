@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { Group } from '../models/Group';
+import { User } from '../models/User';
 import { v4 as uuidv4 } from 'uuid';
 
 export const createGroup = async (req: Request, res: Response) => {
@@ -56,6 +57,17 @@ export const joinGroup = async (req: Request, res: Response) => {
 
         group.members.push(userId);
         await group.save();
+
+        // Record Activity
+        const { createActivity } = require('./activityController');
+        const user = await User.findById(userId);
+        await createActivity({
+            group: group._id.toString(),
+            userId,
+            userName: user?.name || 'Someone',
+            type: 'MEMBER_JOINED',
+            description: 'joined the group'
+        });
 
         const { emitToGroup } = require('../services/socketService');
         emitToGroup(group._id.toString(), 'group_updated', { type: 'MEMBER_JOINED', userId });

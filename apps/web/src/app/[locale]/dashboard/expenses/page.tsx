@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
 import { MemoryModal } from '@/components/MemoryModal';
+import { ActivityFeed, Activity } from '@/components/ActivityFeed';
 import { useState, useEffect, Suspense, useCallback, useRef } from 'react';
 import { Camera } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -69,6 +70,7 @@ function ExpensesContent() {
     const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
     const [loading, setLoading] = useState(true);
     const t = useTranslations('Expenses');
+    const [activities, setActivities] = useState<Activity[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [summary, setSummary] = useState<any>(null);
 
@@ -260,10 +262,24 @@ function ExpensesContent() {
                 }
             };
 
+            const handleActivity = (newActivity: Activity) => {
+                console.log('[socket]: New activity received:', newActivity);
+                setActivities(prev => [newActivity, ...prev].slice(0, 20));
+            };
+
             socket.on('group_updated', handleUpdate);
+            socket.on('new_activity', handleActivity);
+
+            // Fetch initial activities
+            api.get(`/activities/group/${groupId}`).then(res => {
+                setActivities(res.data);
+            }).catch(err => {
+                console.error('Failed to fetch activities:', err);
+            });
 
             return () => {
                 socket.off('group_updated', handleUpdate);
+                socket.off('new_activity', handleActivity);
                 socket.disconnect();
             };
         }
@@ -632,8 +648,8 @@ function ExpensesContent() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                <div className="lg:col-span-3 space-y-6">
                     <div className="flex items-center justify-between px-2">
                         <h2 className="text-xl md:text-2xl font-black tracking-tighter text-white uppercase">{t('ledger')}</h2>
                         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600 hidden sm:inline">{t('secureRecords')}</span>
@@ -725,6 +741,19 @@ function ExpensesContent() {
                             {t('recordSettlement')}
                         </Button>
                     </div>
+                </div>
+
+                {/* Activity Feed - Desktop Sidebar (LG+ screens) */}
+                <div className="hidden lg:block lg:col-span-2 h-[700px] sticky top-24">
+                    <ActivityFeed activities={activities} />
+                </div>
+            </div>
+
+            {/* Activity Feed - Mobile/Tablet Section */}
+            <div className="lg:hidden">
+                <h2 className="text-xl md:text-2xl font-black tracking-tighter text-white uppercase mb-6 px-2">Live Trip Feed</h2>
+                <div className="h-[500px]">
+                    <ActivityFeed activities={activities} />
                 </div>
             </div>
 
