@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Sparkles, MapPin, Calendar, Users, Loader2, ChevronDown, DollarSign, Clock, Utensils, Hotel, CheckCircle2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import api from "@/utils/api";
 
 interface TripPlan {
     tripOverview: {
@@ -73,24 +74,15 @@ export default function AIPlannerPage() {
         setTripPlan(null);
 
         try {
-            const token = localStorage.getItem("token");
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-            const response = await fetch(`${apiUrl}/api/ai-planner/generate`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({ from, to, days, people, locale: params.locale }),
+            const response = await api.post('/ai-planner/generate', {
+                from,
+                to,
+                days,
+                people,
+                locale: params.locale
             });
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || "Failed to generate trip plan");
-            }
-
-            setTripPlan(data.data);
+            setTripPlan(response.data.data);
         } catch (err: any) {
             setError(err.message || "Something went wrong");
         } finally {
