@@ -4,7 +4,7 @@ import DashboardLayout from "../dashboard/layout";
 import { TravelMap } from "@/components/TravelMap";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
-import { Sparkles, Filter, Search } from "lucide-react";
+import { Sparkles, Filter, Search, X } from "lucide-react";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -33,6 +33,8 @@ export default function RecommendPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [isSearching, setIsSearching] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
 
     // Track fetched IDs to avoid redundant requests
     const fetchedIds = useRef<Set<string>>(new Set());
@@ -201,7 +203,28 @@ export default function RecommendPage() {
         }
     }, [currentRouteData, selectedSpot, loadingRoute, allRoutes]);
 
-    const displaySpots = searchQuery.length > 2 ? searchResults : curatedSpots;
+    // Apply filters
+    const filteredSpots = useMemo(() => {
+        if (selectedFilters.length === 0) return curatedSpots;
+        return curatedSpots.filter(spot => {
+            const spotName = spot.name.en.toLowerCase();
+            return selectedFilters.some(filter => {
+                switch (filter) {
+                    case 'sylhet': return spotName.includes('sylhet') || spotName.includes('srimangal') || spotName.includes('tanguar');
+                    case 'chattogram': return spotName.includes('cox') || spotName.includes('bandarban') || spotName.includes('saint martin');
+                    case 'khulna': return spotName.includes('sundarban') || spotName.includes('kuakata');
+                    case 'rangamati': return spotName.includes('sajek');
+                    case 'nature': return true; // All spots are nature-related
+                    case 'beach': return spotName.includes('cox') || spotName.includes('kuakata') || spotName.includes('saint martin');
+                    case 'hills': return spotName.includes('sajek') || spotName.includes('bandarban');
+                    case 'forest': return spotName.includes('sundarban') || spotName.includes('tanguar') || spotName.includes('sylhet') || spotName.includes('srimangal');
+                    default: return true;
+                }
+            });
+        });
+    }, [selectedFilters]);
+
+    const displaySpots = searchQuery.length > 2 ? searchResults : filteredSpots;
 
     return (
         <DashboardLayout>
@@ -235,10 +258,101 @@ export default function RecommendPage() {
                                 <div className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
                             )}
                         </div>
-                        <Button variant="outline" className="h-14 shrink-0">
-                            <Filter className="mr-2 w-5 h-5" />
-                            {t('filters')}
-                        </Button>
+                        <div className="relative">
+                            <Button
+                                variant="outline"
+                                className="h-14 shrink-0"
+                                onClick={() => setIsFilterOpen(!isFilterOpen)}
+                            >
+                                <Filter className="mr-2 w-5 h-5" />
+                                {t('filters')}
+                                {selectedFilters.length > 0 && (
+                                    <span className="ml-2 px-2 py-0.5 bg-emerald-500 text-black rounded-full text-xs font-bold">
+                                        {selectedFilters.length}
+                                    </span>
+                                )}
+                            </Button>
+
+                            {/* Filter Dropdown */}
+                            {isFilterOpen && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="absolute right-0 top-full mt-2 w-72 bg-[#0a0f0d] border border-white/10 rounded-2xl p-4 shadow-2xl z-50"
+                                >
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h3 className="font-bold text-sm">Filter Spots</h3>
+                                        {selectedFilters.length > 0 && (
+                                            <button
+                                                onClick={() => setSelectedFilters([])}
+                                                className="text-xs text-emerald-500 hover:text-emerald-400"
+                                            >
+                                                Clear All
+                                            </button>
+                                        )}
+                                    </div>
+
+                                    {/* Region Filters */}
+                                    <div className="mb-4">
+                                        <p className="text-xs text-zinc-500 font-bold mb-2 uppercase tracking-wider">Region</p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {[
+                                                { id: 'sylhet', label: 'Sylhet' },
+                                                { id: 'chattogram', label: 'Chattogram' },
+                                                { id: 'khulna', label: 'Khulna' },
+                                                { id: 'rangamati', label: 'Rangamati' },
+                                            ].map(({ id, label }) => (
+                                                <button
+                                                    key={id}
+                                                    onClick={() => {
+                                                        setSelectedFilters(prev =>
+                                                            prev.includes(id)
+                                                                ? prev.filter(f => f !== id)
+                                                                : [...prev, id]
+                                                        );
+                                                    }}
+                                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${selectedFilters.includes(id)
+                                                            ? 'bg-emerald-500 text-black'
+                                                            : 'bg-white/5 text-zinc-400 hover:bg-white/10'
+                                                        }`}
+                                                >
+                                                    {label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Type Filters */}
+                                    <div>
+                                        <p className="text-xs text-zinc-500 font-bold mb-2 uppercase tracking-wider">Type</p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {[
+                                                { id: 'beach', label: '🏖️ Beach' },
+                                                { id: 'hills', label: '⛰️ Hills' },
+                                                { id: 'forest', label: '🌲 Forest' },
+                                            ].map(({ id, label }) => (
+                                                <button
+                                                    key={id}
+                                                    onClick={() => {
+                                                        setSelectedFilters(prev =>
+                                                            prev.includes(id)
+                                                                ? prev.filter(f => f !== id)
+                                                                : [...prev, id]
+                                                        );
+                                                    }}
+                                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${selectedFilters.includes(id)
+                                                            ? 'bg-emerald-500 text-black'
+                                                            : 'bg-white/5 text-zinc-400 hover:bg-white/10'
+                                                        }`}
+                                                >
+                                                    {label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </div>
                     </div>
                 </div>
 
