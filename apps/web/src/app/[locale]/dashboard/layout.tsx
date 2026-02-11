@@ -17,6 +17,7 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
     useEffect(() => {
         const joinRooms = async () => {
@@ -41,7 +42,12 @@ export default function DashboardLayout({
 
     return (
         <div className="flex h-screen bg-[#060a08] text-white overflow-hidden relative">
-            <DashboardSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+            <DashboardSidebar
+                isOpen={isSidebarOpen}
+                onClose={() => setIsSidebarOpen(false)}
+                isCollapsed={isSidebarCollapsed}
+                onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+            />
 
             <main className="flex-1 overflow-y-auto relative flex flex-col">
                 {/* Mobile Header */}
