@@ -281,26 +281,26 @@ export default function RecommendPage() {
                                     className="absolute right-0 top-full mt-2 w-72 bg-[#0a0f0d] border border-white/10 rounded-2xl p-4 shadow-2xl z-50"
                                 >
                                     <div className="flex items-center justify-between mb-4">
-                                        <h3 className="font-bold text-sm">Filter Spots</h3>
+                                        <h3 className="font-bold text-sm">{t('filterSpots')}</h3>
                                         {selectedFilters.length > 0 && (
                                             <button
                                                 onClick={() => setSelectedFilters([])}
                                                 className="text-xs text-emerald-500 hover:text-emerald-400"
                                             >
-                                                Clear All
+                                                {t('clearAll')}
                                             </button>
                                         )}
                                     </div>
 
                                     {/* Region Filters */}
                                     <div className="mb-4">
-                                        <p className="text-xs text-zinc-500 font-bold mb-2 uppercase tracking-wider">Region</p>
+                                        <p className="text-xs text-zinc-500 font-bold mb-2 uppercase tracking-wider">{t('filterRegion')}</p>
                                         <div className="flex flex-wrap gap-2">
                                             {[
-                                                { id: 'sylhet', label: 'Sylhet' },
-                                                { id: 'chattogram', label: 'Chattogram' },
-                                                { id: 'khulna', label: 'Khulna' },
-                                                { id: 'rangamati', label: 'Rangamati' },
+                                                { id: 'sylhet', label: t('regionSylhet') },
+                                                { id: 'chattogram', label: t('regionChattogram') },
+                                                { id: 'khulna', label: t('regionKhulna') },
+                                                { id: 'rangamati', label: t('regionRangamati') },
                                             ].map(({ id, label }) => (
                                                 <button
                                                     key={id}
@@ -312,8 +312,8 @@ export default function RecommendPage() {
                                                         );
                                                     }}
                                                     className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${selectedFilters.includes(id)
-                                                            ? 'bg-emerald-500 text-black'
-                                                            : 'bg-white/5 text-zinc-400 hover:bg-white/10'
+                                                        ? 'bg-emerald-500 text-black'
+                                                        : 'bg-white/5 text-zinc-400 hover:bg-white/10'
                                                         }`}
                                                 >
                                                     {label}
@@ -324,12 +324,12 @@ export default function RecommendPage() {
 
                                     {/* Type Filters */}
                                     <div>
-                                        <p className="text-xs text-zinc-500 font-bold mb-2 uppercase tracking-wider">Type</p>
+                                        <p className="text-xs text-zinc-500 font-bold mb-2 uppercase tracking-wider">{t('filterType')}</p>
                                         <div className="flex flex-wrap gap-2">
                                             {[
-                                                { id: 'beach', label: '🏖️ Beach' },
-                                                { id: 'hills', label: '⛰️ Hills' },
-                                                { id: 'forest', label: '🌲 Forest' },
+                                                { id: 'beach', label: `🏖️ ${t('typeBeach')}` },
+                                                { id: 'hills', label: `⛰️ ${t('typeHills')}` },
+                                                { id: 'forest', label: `🌲 ${t('typeForest')}` },
                                             ].map(({ id, label }) => (
                                                 <button
                                                     key={id}
@@ -341,8 +341,8 @@ export default function RecommendPage() {
                                                         );
                                                     }}
                                                     className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${selectedFilters.includes(id)
-                                                            ? 'bg-emerald-500 text-black'
-                                                            : 'bg-white/5 text-zinc-400 hover:bg-white/10'
+                                                        ? 'bg-emerald-500 text-black'
+                                                        : 'bg-white/5 text-zinc-400 hover:bg-white/10'
                                                         }`}
                                                 >
                                                     {label}
