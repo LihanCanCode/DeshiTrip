@@ -6,7 +6,9 @@ import { getOutbox, removeFromOutbox, isOnline, saveToCache } from '@/utils/offl
 
 export const SyncManager = () => {
     const warmCache = useCallback(async () => {
-        if (!isOnline()) return;
+        // Check if user is logged in
+        const token = localStorage.getItem('token');
+        if (!isOnline() || !token) return;
 
         try {
             console.log('[SyncManager] Warming cache...');
@@ -36,7 +38,8 @@ export const SyncManager = () => {
     }, []);
 
     const handleSync = useCallback(async () => {
-        if (!isOnline()) return;
+        const token = localStorage.getItem('token');
+        if (!isOnline() || !token) return;
 
         const outbox = getOutbox();
 

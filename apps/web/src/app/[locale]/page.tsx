@@ -2,6 +2,7 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { HomeNav, FeatureCards } from './HomeClient';
 import { AuthRedirect } from '@/components/auth/AuthRedirect';
+import { HeroBackground } from '@/components/ui/HeroBackground';
 
 export default function Home({ params }: { params: { locale: string } }) {
   const t = useTranslations('Index');
@@ -9,9 +10,7 @@ export default function Home({ params }: { params: { locale: string } }) {
   return (
     <main className="min-h-screen bg-[#0a0f0d] text-white overflow-hidden relative">
       <AuthRedirect />
-      {/* Background Glows */}
-      <div className="absolute top-0 -left-20 w-96 h-96 bg-emerald-600/20 rounded-full blur-[100px] animate-pulse" />
-      <div className="absolute bottom-0 -right-20 w-96 h-96 bg-emerald-900/20 rounded-full blur-[100px]" />
+      <HeroBackground />
 
       <HomeNav locale={params.locale} />
 
@@ -39,12 +38,14 @@ export default function Home({ params }: { params: { locale: string } }) {
               {t('exploreSpots')}
             </Link>
           </div>
+
+          <div className="mt-20">
+            <FeatureCards />
+          </div>
         </div>
       </section>
 
-      <section className="container mx-auto px-6 py-20 relative z-10">
-        <FeatureCards />
-      </section>
+
     </main>
   );
 }
