@@ -15,6 +15,7 @@ export interface Spot {
     location: { coordinates: [number, number] };
     description?: { en: string; bn: string };
     tourPlan?: TourPlan;
+    image?: string;
     isSearchResult?: boolean;
 }
 
@@ -22,6 +23,7 @@ export const spotsData: Spot[] = [
     {
         _id: '1',
         name: { en: 'Sylhet', bn: 'সিলেট' },
+        image: '/images/spots/sylhet.jpeg',
         location: { coordinates: [91.9333, 24.9833] },
         description: {
             en: "The only swamp forest in Bangladesh, located in Gowainghat, Sylhet. Known as the Amazon of Bangladesh.",
@@ -54,6 +56,7 @@ export const spotsData: Spot[] = [
     {
         _id: '2',
         name: { en: 'Cox\'s Bazar', bn: 'কক্সবাজার' },
+        image: '/images/spots/beach.jpg',
         location: { coordinates: [91.9760, 21.4272] },
         description: {
             en: "The longest natural sea beach in the world. A popular tourist destination in Bangladesh.",
@@ -87,6 +90,7 @@ export const spotsData: Spot[] = [
     {
         _id: '3',
         name: { en: 'Sundarbans', bn: 'সুন্দরবন' },
+        image: '/images/spots/sundarban.jpeg',
         location: { coordinates: [89.6053, 22.4851] },
         description: {
             en: "The largest mangrove forest in the world, home to the Royal Bengal Tiger.",
@@ -118,6 +122,7 @@ export const spotsData: Spot[] = [
     {
         _id: '4',
         name: { en: 'Sajek Valley', bn: 'সাজেক ভ্যালি' },
+        image: '/images/spots/sajek.jpg',
         location: { coordinates: [92.2938, 23.3820] },
         description: {
             en: "Known as the Queen of Hills & Roof of Rangamati. Famous for cloud gazing.",
@@ -150,6 +155,7 @@ export const spotsData: Spot[] = [
     {
         _id: '5',
         name: { en: 'Saint Martin\'s (Gateway: Teknaf)', bn: 'সেন্ট মার্টিন (তরণ: টেকনাফ)' },
+        image: '/images/spots/Saint Martin.jpg',
         location: { coordinates: [92.2957, 20.8633] }, // Teknaf Port
         description: {
             en: "The only coral island of Bangladesh situated in the Bay of Bengal.",
@@ -182,6 +188,7 @@ export const spotsData: Spot[] = [
     {
         _id: '6',
         name: { en: 'Srimangal (Tea Capital)', bn: 'শ্রীমঙ্গল (চায়ের রাজধানী)' },
+        image: '/images/spots/sreemangal.jpeg',
         location: { coordinates: [91.7333, 24.3083] },
         description: {
             en: "The tea capital of Bangladesh, famous for its lush tea gardens and rainwater forest.",
@@ -214,6 +221,7 @@ export const spotsData: Spot[] = [
     {
         _id: '7',
         name: { en: 'Bandarban (Hills)', bn: 'বান্দরবান (পাহাড়)' },
+        image: '/images/spots/bandarban.jpeg',
         location: { coordinates: [92.1917, 22.2333] },
         description: {
             en: "Known as the Darjeeling of Bangladesh, famous for high peaks and tribal culture.",
@@ -247,6 +255,7 @@ export const spotsData: Spot[] = [
     {
         _id: '8',
         name: { en: 'Tanguar Haor (Gateway: Tahirpur)', bn: 'টাঙ্গুয়ার হাওর (তরণ: তাহিরপুর)' },
+        image: '/images/spots/tanguar.jpg',
         location: { coordinates: [91.1782, 25.0921] }, // Tahirpur Road End
         description: {
             en: "A unique freshwater wetland ecosystem and a UNESCO Ramsar site in Sunamganj.",
@@ -278,6 +287,7 @@ export const spotsData: Spot[] = [
     {
         _id: '9',
         name: { en: 'Kuakata (Sagar Kannya)', bn: 'কুয়াকাটা (সাগর কন্যা)' },
+        image: '/images/spots/kuakata.jpg',
         location: { coordinates: [90.1808, 21.8210] },
         description: {
             en: "Famous for panoramic sea views and being able to see both sunrise and sunset.",
@@ -305,32 +315,6 @@ export const spotsData: Spot[] = [
                 { en: "Kuakata Grand", bn: "কুয়াকাটা গ্র্যান্ড" }
             ],
             totalEstimatedCost: { en: "5,000 - 10,000 BDT per person (2 days)", bn: "৫,০০০ - ১০,০০০ টাকা জনপ্রতি (২ দিন)" }
-        }
-    },
-    {
-        _id: '10',
-        name: { en: 'Jaflong (Sylhet)', bn: 'জাফলং (সিলেট)' },
-        location: { coordinates: [92.0163, 25.1587] },
-        description: {
-            en: "A picturesque hill station famous for its tea gardens and stone collection.",
-            bn: "চা বাগান এবং পাথর সংগ্রহের জন্য বিখ্যাত একটি মনোরম হিল স্টেশন।"
-        },
-        tourPlan: {
-            transport: [
-                {
-                    method: { en: "Bus", bn: "বাস" },
-                    details: { en: "Sylhet city to Jaflong (Local/Reserve)", bn: "সিলেট শহর থেকে জাফলং (লোকাল/রিজার্ভ)" },
-                    cost: "100 - 2000 BDT"
-                }
-            ],
-            sightseeing: [
-                { en: "Lalakhal Blue Water", bn: "লালাখাল নীল জল" },
-                { en: "Piain River Zero Point", bn: "পিয়াইন নদী জিরো পয়েন্ট" }
-            ],
-            hotels: [
-                { en: "Grand Sylhet Hotel", bn: "গ্র্যান্ড সিলেট হোটেল" }
-            ],
-            totalEstimatedCost: { en: "4,000 - 7,000 BDT per person (Day trip)", bn: "৪,০০০ - ৭,০০০ টাকা জনপ্রতি (ডে ট্রিপ)" }
         }
     }
 ];

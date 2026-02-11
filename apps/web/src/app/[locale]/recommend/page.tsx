@@ -298,7 +298,39 @@ export default function RecommendPage() {
                         </div>
                     </div>
 
-                    <div className="lg:col-span-3 min-h-[400px] md:min-h-[500px] order-1 lg:order-2">
+                    <div className="lg:col-span-3 min-h-[400px] md:min-h-[500px] order-1 lg:order-2 space-y-4">
+                        {/* Hero Image Banner */}
+                        {selectedSpot && selectedSpot.image && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.4 }}
+                                className="relative h-56 md:h-64 rounded-3xl overflow-hidden border border-white/5 shadow-2xl"
+                            >
+                                <img
+                                    src={selectedSpot.image}
+                                    alt={selectedSpot.name[currentLocale]}
+                                    className="absolute inset-0 w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                                <div className="absolute bottom-6 left-6 right-6">
+                                    <h2 className="text-3xl md:text-4xl font-black text-white mb-2">
+                                        {selectedSpot.name[currentLocale] || selectedSpot.name.en}
+                                    </h2>
+                                    {routeMetrics && (
+                                        <div className="flex items-center gap-4 text-emerald-400 text-sm font-bold">
+                                            <span className="flex items-center gap-1">
+                                                <span>📍</span> {routeMetrics.distance}
+                                            </span>
+                                            <span className="flex items-center gap-1">
+                                                <span>🚗</span> {routeMetrics.duration} {t('drive')}
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+                            </motion.div>
+                        )}
+
                         <TravelMap
                             spots={displaySpots}
                             selectedSpot={selectedSpot}
