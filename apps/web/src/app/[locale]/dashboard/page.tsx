@@ -220,8 +220,10 @@ export default function DashboardPage() {
                     </div>
                     <div className="space-y-4">
                         {[
-                            { spot: 'Ratargul', district: 'Sylhet', image: 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=400&auto=format&fit=crop' },
-                            { spot: 'Sundarbans', district: 'Khulna', image: 'https://images.unsplash.com/photo-1623945359620-8049281559ed?w=400&auto=format&fit=crop' },
+                            { spot: "Cox's Bazar", district: 'Chattogram', image: '/images/spots/beach.jpg' },
+                            { spot: 'Sylhet', district: 'Sylhet', image: '/images/spots/sylhet.jpeg' },
+                            { spot: 'Sajek Valley', district: 'Rangamati', image: '/images/spots/sajek.jpg' },
+                            { spot: 'Sundarbans', district: 'Khulna', image: '/images/spots/sundarban.jpeg' },
                         ].map((rec, i) => (
                             <Link href={`/${locale}/recommend`} key={i} className="block group relative overflow-hidden rounded-[2rem] md:rounded-[2.5rem] h-48 md:h-56 cursor-pointer border border-white/5 shadow-2xl">
                                 <img
