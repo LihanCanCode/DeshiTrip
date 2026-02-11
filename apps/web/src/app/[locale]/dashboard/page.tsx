@@ -225,7 +225,7 @@ export default function DashboardPage() {
                             { spot: 'Sajek Valley', district: 'Rangamati', image: '/images/spots/sajek.jpg' },
                             { spot: 'Sundarbans', district: 'Khulna', image: '/images/spots/sundarban.jpeg' },
                         ].map((rec, i) => (
-                            <Link href={`/${locale}/recommend`} key={i} className="block group relative overflow-hidden rounded-[2rem] md:rounded-[2.5rem] h-48 md:h-56 cursor-pointer border border-white/5 shadow-2xl">
+                            <Link href={`/${locale}/recommend?spot=${encodeURIComponent(rec.spot)}`} key={i} className="block group relative overflow-hidden rounded-[2rem] md:rounded-[2.5rem] h-48 md:h-56 cursor-pointer border border-white/5 shadow-2xl">
                                 <img
                                     src={rec.image}
                                     alt={rec.spot}

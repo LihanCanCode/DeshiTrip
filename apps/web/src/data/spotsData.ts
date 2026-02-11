@@ -21,7 +21,7 @@ export interface Spot {
 export const spotsData: Spot[] = [
     {
         _id: '1',
-        name: { en: 'Ratargul (Sylhet)', bn: 'রাতারগুল (সিলেট)' },
+        name: { en: 'Sylhet', bn: 'সিলেট' },
         location: { coordinates: [91.9333, 24.9833] },
         description: {
             en: "The only swamp forest in Bangladesh, located in Gowainghat, Sylhet. Known as the Amazon of Bangladesh.",
@@ -86,7 +86,7 @@ export const spotsData: Spot[] = [
     },
     {
         _id: '3',
-        name: { en: 'Sundarbans (Gateway: Mongla)', bn: 'সুন্দরবন (তরণ: মোংলা)' },
+        name: { en: 'Sundarbans', bn: 'সুন্দরবন' },
         location: { coordinates: [89.6053, 22.4851] },
         description: {
             en: "The largest mangrove forest in the world, home to the Royal Bengal Tiger.",

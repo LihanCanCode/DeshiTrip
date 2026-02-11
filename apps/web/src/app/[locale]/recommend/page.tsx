@@ -37,6 +37,20 @@ export default function RecommendPage() {
     // Track fetched IDs to avoid redundant requests
     const fetchedIds = useRef<Set<string>>(new Set());
 
+    // Auto-select spot from URL parameter
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const urlParams = new URLSearchParams(window.location.search);
+            const spotName = urlParams.get('spot');
+            if (spotName) {
+                const matchingSpot = curatedSpots.find(s => s.name.en === spotName || s.name.bn === spotName);
+                if (matchingSpot) {
+                    setSelectedSpot(matchingSpot);
+                }
+            }
+        }
+    }, []);
+
     // Get User Location
     useEffect(() => {
         if ("geolocation" in navigator) {
