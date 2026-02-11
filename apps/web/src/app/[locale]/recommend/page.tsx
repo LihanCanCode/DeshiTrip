@@ -117,12 +117,23 @@ export default function RecommendPage() {
                     const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery + " Bangladesh")}&limit=5`);
                     const data = await res.json();
 
-                    const formattedResults = data.map((item: { place_id: string; display_name: string; lon: string; lat: string }) => ({
-                        _id: `search-${item.place_id}`,
-                        name: { en: item.display_name.split(',')[0], bn: item.display_name.split(',')[0] },
-                        location: { coordinates: [parseFloat(item.lon), parseFloat(item.lat)] },
-                        isSearchResult: true
-                    }));
+                    const formattedResults = data.map((item: { place_id: string; display_name: string; lon: string; lat: string }) => {
+                        const spotName = item.display_name.split(',')[0];
+
+                        // Assign image if search matches known locations
+                        let image: string | undefined;
+                        if (spotName.toLowerCase().includes('rangamati')) {
+                            image = '/images/spots/rangamati.jpeg';
+                        }
+
+                        return {
+                            _id: `search-${item.place_id}`,
+                            name: { en: spotName, bn: spotName },
+                            location: { coordinates: [parseFloat(item.lon), parseFloat(item.lat)] },
+                            image,
+                            isSearchResult: true
+                        };
+                    });
 
                     setSearchResults(formattedResults);
                 } catch (err) {
